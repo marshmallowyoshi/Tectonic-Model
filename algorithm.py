@@ -502,3 +502,6 @@ def reduceDataResample(x, factor):
 
 def reduceDataDecimate(x, factor):
     return decimate(x, int(factor))
+
+def closestArg(array, val):
+    return np.abs(np.asarray(array)-val).argmin()

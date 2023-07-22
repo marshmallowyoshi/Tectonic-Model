@@ -26,39 +26,42 @@ contWav = alg.waveletGen(x,y)
 
 ############################################################################################################################################
 
-allSegments, allCurves = alg.newFullSegmentAnalysis(x,y, name=name, peakRateThreshold=peakRateThreshold, join=True, segmentMode='poly', plot=True)
-plt.show()
+# allSegments, allCurves = alg.newFullSegmentAnalysis(x,y, name=name, peakRateThreshold=peakRateThreshold, join=True, segmentMode='poly', plot=True)
+# plt.show()
 
 ############################################################################################################################################
 
-# sampleFactor = 1
-# segmentCount = 0
-# allSegmentsFull = alg.newFullSegmentAnalysis(x,y, name=name, peakRateThreshold=peakRateThreshold, join=True, segmentMode='flat')
-# xNew = x
-# yNew = y
-# while True:
-#     sampleFactor = sampleFactor+1
-#     # xNew = signal.decimate(x, int(sampleFactor))
-#     # yNew = signal.decimate(y, int(sampleFactor))
+sampleFactor = 1
+segmentCount = 0
+allSegmentsFull = alg.newFullSegmentAnalysis(x,y, name=name, peakRateThreshold=peakRateThreshold, join=True, segmentMode='flat')
+xNew = x
+yNew = y
+while True:
+    sampleFactor = sampleFactor+1
+    # xNew = signal.decimate(x, int(sampleFactor))
+    # yNew = signal.decimate(y, int(sampleFactor))
     
-#     print('Number of Samples: ', len(xNew))
-#     allSegments = alg.newFullSegmentAnalysis(xNew,yNew, name=name, peakRateThreshold=peakRateThreshold, join=True, segmentMode='flat', plot=False)
-#     if len(allSegments) < len(allSegmentsFull) or len(xNew) < 4:
-#         xPrevious = alg.reduceDataDecimate(x, sampleFactor-2)
-#         yPrevious = alg.reduceDataDecimate(y, sampleFactor-2)
-#         print('Starting Samples: ', len(x),'Minimum Samples: ', len(xPrevious))
-#         percentage = 100 * (len(x)/len(xPrevious)) / np.min([i[2]-i[0] for i in allSegmentsFull])
-#         oldSegments = alg.newFullSegmentAnalysis(xPrevious,yPrevious, name=name, peakRateThreshold=peakRateThreshold, join=True, segmentMode='poly', plot=True)[0]
-#         newPercentage = np.min([np.abs(np.asarray(signal.resample(x, 250))-signal.resample(xPrevious, 250)[i[2]]).argmin()-np.abs(np.asarray(signal.resample(x, 250))-signal.resample(xPrevious, 250)[i[0]]).argmin() for i in oldSegments])
-#         print(np.asarray(signal.resample(x, 250)))
-#         # print('Sample as Percentage of Fault Length: ', percentage, '%')
+    print('Number of Samples: ', len(xNew))
+    allSegments = alg.newFullSegmentAnalysis(xNew,yNew, name=name, peakRateThreshold=peakRateThreshold, join=True, segmentMode='flat', plot=False)
+    if len(allSegments) < len(allSegmentsFull) or len(xNew) < 4:
+        xPrevious = alg.reduceDataDecimate(x, sampleFactor-2)
+        yPrevious = alg.reduceDataDecimate(y, sampleFactor-2)
+        print('Starting Samples: ', len(x),'Minimum Samples: ', len(xPrevious))
+        oldSegments = alg.newFullSegmentAnalysis(xPrevious,yPrevious, name=name, peakRateThreshold=peakRateThreshold, join=True, segmentMode='poly', plot=True)[0]
+        xPreviousRescaled = np.linspace(0,250,len(xPrevious))
+        allSizes = [alg.closestArg(xPreviousRescaled, i[2])-alg.closestArg(xPreviousRescaled, i[0]) for i in oldSegments]
+        percentage = 100/np.min(allSizes)
 
-#         plt.scatter(np.linspace(0, 249, len(xPrevious)),29*yPrevious/np.max(yPrevious), color='black', s=3)
-#         plt.show()
+        print('Sample as Percentage of Fault Length: ', percentage, '%')
 
-#         allSegments = alg.newFullSegmentAnalysis(xNew,yNew, name=name, peakRateThreshold=peakRateThreshold, join=True, segmentMode='poly', plot=True)
-#         plt.scatter(np.linspace(0, 249, len(xNew)),29*yNew/np.max(yNew), color='black', s=3)
-#         plt.show()
-#         break
-#     xNew = alg.reduceDataDecimate(x, sampleFactor)
-#     yNew = alg.reduceDataDecimate(y, sampleFactor)
+        plt.scatter(np.linspace(0, 249, len(xPrevious)),29*yPrevious/np.max(yPrevious), color='black', s=3)
+        plt.title("Minimum Sample Rate")
+        plt.show()
+
+        allSegments = alg.newFullSegmentAnalysis(xNew,yNew, name=name, peakRateThreshold=peakRateThreshold, join=True, segmentMode='poly', plot=True)
+        plt.scatter(np.linspace(0, 249, len(xNew)),29*yNew/np.max(yNew), color='black', s=3)
+        plt.title("Below Minimum Sample Rate")
+        plt.show()
+        break
+    xNew = alg.reduceDataDecimate(x, sampleFactor)
+    yNew = alg.reduceDataDecimate(y, sampleFactor)
