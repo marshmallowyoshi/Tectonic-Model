@@ -505,3 +505,53 @@ def reduceDataDecimate(x, factor):
 
 def closestArg(array, val):
     return np.abs(np.asarray(array)-val).argmin()
+
+def findMinimumSampleRate(x, y, samplingMode='decimate', bands=(1,31), sampling_period=0.1, wtype='mexh', name='Unknown', peakRateThreshold=0.03, degree=3, plot=False):
+    allSegmentsFull = newFullSegmentAnalysis(x,y, name=name, peakRateThreshold=peakRateThreshold, join=True, segmentMode='flat')
+    xNew = x
+    yNew = y
+
+    sampleFactor = 1
+    segmentCount = 0
+    while True:
+        # Gradual increase in sample reduction
+        sampleFactor = sampleFactor+1
+        
+        print('Number of Samples: ', len(xNew))
+        allSegments = newFullSegmentAnalysis(xNew,yNew, name=name, peakRateThreshold=peakRateThreshold, join=True, segmentMode='flat', plot=False)
+        if len(allSegments) < len(allSegmentsFull) or len(xNew) < 4:
+            # reproduce previous sample rate
+            if samplingMode == 'decimate':
+                xPrevious = reduceDataDecimate(x, sampleFactor-2)
+                yPrevious = reduceDataDecimate(y, sampleFactor-2)
+            else:
+                xPrevious = reduceDataResample(x, sampleFactor-2)
+                yPrevious = reduceDataResample(y, sampleFactor-2)
+            print('Starting Samples: ', len(x),'Minimum Samples: ', len(xPrevious))
+            # Find smallest segment length
+            oldSegments = newFullSegmentAnalysis(xPrevious,yPrevious, name=name, peakRateThreshold=peakRateThreshold, join=True, segmentMode='poly', plot=True)[0]
+            xPreviousRescaled = np.linspace(0,250,len(xPrevious))
+            allSizes = [closestArg(xPreviousRescaled, i[2])-closestArg(xPreviousRescaled, i[0]) for i in oldSegments]
+            percentage = 100/np.min(allSizes)
+
+            print('Sample as Percentage of Fault Length: ', percentage, '%')
+
+            if plot == True:
+                # One plot at minimum sample rate and another at the step below
+                plt.scatter(np.linspace(0, 249, len(xPrevious)),29*yPrevious/np.max(yPrevious), color='black', s=3)
+                plt.title("Minimum Sample Rate")
+                plt.show()
+
+                allSegments = newFullSegmentAnalysis(xNew,yNew, name=name, peakRateThreshold=peakRateThreshold, join=True, segmentMode='poly', plot=True)
+                plt.scatter(np.linspace(0, 249, len(xNew)),29*yNew/np.max(yNew), color='black', s=3)
+                plt.title("Below Minimum Sample Rate")
+                plt.show()
+            break
+        # go to next sample rate
+        if samplingMode == 'decimate':
+            xNew = reduceDataDecimate(x, sampleFactor)
+            yNew = reduceDataDecimate(y, sampleFactor)
+        else:
+            xNew = reduceDataResample(x, sampleFactor)
+            yNew = reduceDataResample(y, sampleFactor)
+    return percentage
