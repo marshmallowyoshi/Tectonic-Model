@@ -558,11 +558,26 @@ def findMinimumSampleRate(x, y, samplingMode='decimate', bands=(1,31), sampling_
     return percentage
 
 def integralDifference(poly1, poly2, bounds):
+    """ Returns the percentage difference between the integrals of two polynomials
+    Output:
+    [0] : Percentage difference between the integrals of the two polynomials
+    [1] : Difference between the integrals of the two polynomials
+    [2] : Integral of the first polynomial
+    [3] : Integral of the second polynomial"""
     coeffs_1 = np.asarray(list(poly1.coef_)[::-1] + [poly1.intercept_])
     coeffs_2 = np.asarray(list(poly2.coef_)[::-1] + [poly2.intercept_])
 
     x_segment = np.linspace(bounds[0], bounds[1], 100)
     difference = coeffs_1 - coeffs_2
 
-    area = quad(lambda x: np.abs(difference[0]*x**3 + difference[1]*x**2 + difference[2]*x + difference[3]), bounds[0], bounds[1])
-    return area[0]
+    
+    areaDifference = quad(lambda x: cubicAbs(x, difference[0], difference[1], difference[2], difference[3]), bounds[0], bounds[1])
+    difference_1 = quad(lambda x: cubicAbs(x, coeffs_1[0], coeffs_1[1], coeffs_1[2], coeffs_1[3]), bounds[0], bounds[1])
+    difference_2 = quad(lambda x: cubicAbs(x, coeffs_2[0], coeffs_2[1], coeffs_2[2], coeffs_2[3]), bounds[0], bounds[1])
+    
+    areaDifferencePercentage = 100 * areaDifference[0]/np.max([difference_1[0], difference_2[0]])
+
+    return (areaDifferencePercentage, areaDifference[0], difference_1[0], difference_2[0])
+
+def cubicAbs(x,cube,square,linear,constant):
+    return np.abs(cube*x**3 + square*x**2 + linear*x + constant)
