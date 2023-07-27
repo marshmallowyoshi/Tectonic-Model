@@ -5,6 +5,7 @@ from matplotlib import cm
 import pywt
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
+from scipy.integrate import quad
 
 def waveletGen(x,y, bands=(1,31), sampling_period=0.1, wtype='mexh'):
     scales = np.arange(bands[0],bands[1])
@@ -555,3 +556,13 @@ def findMinimumSampleRate(x, y, samplingMode='decimate', bands=(1,31), sampling_
             xNew = reduceDataResample(x, sampleFactor)
             yNew = reduceDataResample(y, sampleFactor)
     return percentage
+
+def integralDifference(poly1, poly2, bounds):
+    coeffs_1 = np.asarray(list(poly1.coef_)[::-1] + [poly1.intercept_])
+    coeffs_2 = np.asarray(list(poly2.coef_)[::-1] + [poly2.intercept_])
+
+    x_segment = np.linspace(bounds[0], bounds[1], 100)
+    difference = coeffs_1 - coeffs_2
+
+    area = quad(lambda x: np.abs(difference[0]*x**3 + difference[1]*x**2 + difference[2]*x + difference[3]), bounds[0], bounds[1])
+    return area[0]
