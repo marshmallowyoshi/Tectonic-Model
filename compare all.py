@@ -15,19 +15,14 @@ y = np.asarray(df.iloc[:,3])
 
 
 allSegments, polynomialRegression = alg.newFullSegmentAnalysis(x,y, name=name, peakRateThreshold=0.03, join=True, segmentMode='poly', plot=False)
-
 x_2 = alg.reduceDataDecimate(x, 2)
-y_2 = alg.reduceDataDecimate(y, 2)
-
+y_2 = alg.reduceDataDecimate(y, 4)
 allSegments2, polynomialRegression2 = alg.newFullSegmentAnalysis(x_2,y_2, name=name, peakRateThreshold=0.03, join=True, segmentMode='poly', plot=False)
-
-
 area = alg.integralDifference(polynomialRegression[0][0], polynomialRegression2[0][0], (allSegments[0][0],allSegments[0][2]))
-
-
 allAreas = alg.allSegmentsIntegral(allSegments, allSegments2, polynomialRegression, polynomialRegression2)
 
-print(allAreas)
+totalDiff = 100 * np.asarray(allAreas)[:,1].sum()/np.asarray(allAreas)[:,2].sum()
+print(totalDiff)
 
 # numPoints = 100
 # for i in range(len(allSegments)):
