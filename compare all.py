@@ -4,7 +4,8 @@ import algorithm as alg
 import matplotlib.pyplot as plt
 from scipy import integrate
 
-name = 'R2 H3.csv'
+name = 'R2 H3'
+name = 'data/' + name + '.csv'
 df = pd.read_csv(name)
 x = np.asarray(df.iloc[:,0])
 y = np.asarray(df.iloc[:,3])

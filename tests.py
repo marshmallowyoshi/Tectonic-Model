@@ -8,7 +8,8 @@ import scipy.special as sp
 import scipy.optimize as opt
 from scipy import stats
 
-name = 'F9.csv'
+name = 'R3 H3'
+name = 'data/' + name + '.csv'
 df = pd.read_csv(name)
 x = np.asarray(df.iloc[:,0])
 y = np.asarray(df.iloc[:,3])
