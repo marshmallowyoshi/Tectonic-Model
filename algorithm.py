@@ -80,14 +80,14 @@ def segmentPlot(segmentLocations, y, contWav):
     plt.plot([segmentLocations[0],segmentLocations[1],segmentLocations[2]], newTestNorm, color='red')
     plt.stem([segmentLocations[0],segmentLocations[1],segmentLocations[2]], newTestNorm, linefmt='red',markerfmt=' ')
 
-def waveletPlot3D(x, y, contWav):
+def waveletPlot3D(contWav):
     wavX = np.reshape(np.asarray([i for (i,j), value in np.ndenumerate(contWav[0])]), (contWav[0].shape[0],contWav[0].shape[1]))
     wavY = np.reshape(np.asarray([j for (i,j), value in np.ndenumerate(contWav[0])]), (contWav[0].shape[0],contWav[0].shape[1]))
     wavZ = contWav[0]
 
 
     fig, ax = plt.subplots(subplot_kw={'projection': '3d'})
-    ax.plot_surface(wavX, wavY, wavZ, cmap=cm.coolwarm)
+    ax.plot_surface(wavX, wavY, wavZ, cmap=cm.copper)
     return fig, ax
 
 def firstSegment(x, y, contWav, fullx, fully, fullContWav, offset, peakRateThreshold=0.03):
@@ -331,7 +331,7 @@ def reduceDataDecimate(x, factor):
 def closestArg(array, val):
     return np.abs(np.asarray(array)-val).argmin()
 
-def findMinimumSampleRate(x, y, samplingMode='decimate', bands=(1,31), sampling_period=0.1, wtype='mexh', name='Unknown', peakRateThreshold=0.03, degree=3, plot=False):
+def findMinimumSampleRate(x, y, samplingMode='interpolate', bands=(1,31), sampling_period=0.1, wtype='mexh', name='Unknown', peakRateThreshold=0.03, degree=3, plot=False):
     allSegmentsFull = fullSegmentAnalysis(x,y, name=name, peakRateThreshold=peakRateThreshold, join=True, segmentMode='flat')
     xNew = x
     yNew = y
@@ -354,7 +354,7 @@ def findMinimumSampleRate(x, y, samplingMode='decimate', bands=(1,31), sampling_
                 yPrevious = reduceDataResample(y, sampleFactor-2)
             elif samplingMode == 'interpolate':
                 #interpolate mode
-                xPrevious, yPrevious = resampleToPeak(x, y, wtype=wtype, bands=bands, sampling_period=sampling_period, sample_rate_override=len(x) - (int(len(x)/20) * (sampleFactor-2)))
+                xPrevious, yPrevious = resampleToPeak(x, y, wtype=wtype, bands=bands, sampling_period=sampling_period, sample_rate_override=int(len(x) * 0.9**(sampleFactor-1)))
             else:
                 print('Warning: samplingMode not recognised')
 
@@ -387,37 +387,56 @@ def findMinimumSampleRate(x, y, samplingMode='decimate', bands=(1,31), sampling_
             yNew = reduceDataResample(y, sampleFactor)
         elif samplingMode == 'interpolate':
             #interpolate mode
-            xNew, yNew = resampleToPeak(x, y, wtype=wtype, bands=bands, sampling_period=sampling_period, sample_rate_override=len(x) - (int(len(x)/20) * sampleFactor))
+            xNew, yNew = resampleToPeak(x, y, wtype=wtype, bands=bands, sampling_period=sampling_period, sample_rate_override=int(len(x) * 0.9**(sampleFactor-1)))
         else:
             print('Error: samplingMode not recognised')
+        fullSegmentAnalysis(xNew,yNew, name=name, peakRateThreshold=peakRateThreshold, join=True, segmentMode='poly', plot=True)
+        plt.show()
     return percentage
 
-def integralDifference(poly1, poly2, bounds):
+def integralDifference(poly1, poly2, bounds1, bounds2):
     """ Returns the percentage difference between the integrals of two polynomials
     Output:
     [0] : Percentage difference between the integrals of the two polynomials
     [1] : Difference between the integrals of the two polynomials
     [2] : Integral of the first polynomial
     [3] : Integral of the second polynomial"""
+
+    # Limit range to smallest bounding box
+    bounds = (np.max([bounds1[0], bounds2[0]]), np.min([bounds1[1], bounds2[1]]))
+
+    if bounds1[0] != bounds[0]:
+        offset1 = -1*bounds[0] + bounds1[0]
+    else:
+        offset1 = 0
+    if bounds2[0] != bounds[0]:
+        offset2 = -1*bounds[0] + bounds2[0]
+    else:
+        offset2 = 0
+
     coeffs_1 = np.asarray(list(poly1.coef_)[::-1] + [poly1.intercept_])
     coeffs_2 = np.asarray(list(poly2.coef_)[::-1] + [poly2.intercept_])
 
-    difference = coeffs_1 - coeffs_2
 
     
-    areaDifference = quad(lambda x: cubicAbs(x, difference[0], difference[1], difference[2], difference[3]), 0, bounds[1]-bounds[0])
-    difference_1 = quad(lambda x: cubicAbs(x, coeffs_1[0], coeffs_1[1], coeffs_1[2], coeffs_1[3]), 0, bounds[1]-bounds[0])
-    difference_2 = quad(lambda x: cubicAbs(x, coeffs_2[0], coeffs_2[1], coeffs_2[2], coeffs_2[3]), 0, bounds[1]-bounds[0])
+    areaDifference = quad(lambda x: cubicAbsDiff(x, coeffs_1[0], coeffs_1[1], coeffs_1[2], coeffs_1[3], coeffs_2[0], coeffs_2[1], coeffs_2[2], coeffs_2[3], offset1=offset1, offset2=offset2), 0, bounds[1]-bounds[0])
+    difference_1 = quad(lambda x: cubicAbs(x, coeffs_1[0], coeffs_1[1], coeffs_1[2], coeffs_1[3], offset=offset1), 0, bounds[1]-bounds[0])
+    difference_2 = quad(lambda x: cubicAbs(x, coeffs_2[0], coeffs_2[1], coeffs_2[2], coeffs_2[3], offset=offset2), 0, bounds[1]-bounds[0])
     
     areaDifferencePercentage = 100 * areaDifference[0]/np.max([difference_1[0], difference_2[0]])
 
     return (areaDifferencePercentage, areaDifference[0], difference_1[0], difference_2[0])
 
-def cubicAbs(x,cube,square,linear,constant):
-    return np.abs(cube*x**3 + square*x**2 + linear*x + constant)
+def cubicAbs(x,cube,square,linear,constant,offset=0):
+    """ Returns the absolute value of a cubic polynomial"""
+    return np.abs(cube*(x+offset)**3 + square*(x+offset)**2 + linear*(x+offset) + constant)
+
+def cubicAbsDiff(x,cube1,square1,linear1,constant1,cube2,square2,linear2,constant2,offset1=0,offset2=0):
+    """ Returns the absolute value of the difference between two cubic polynomials with offset values"""
+    return np.abs(cube1*(x+offset1)**3 + square1*(x+offset1)**2 + linear1*(x+offset1) + constant1 - (cube2*(x+offset2)**3 + square2*(x+offset2)**2 + linear2*(x+offset2) + constant2))
 
 def allSegmentsIntegral(allSegments, allSegments2, segmentRegression, segmentRegression2):
-    return [integralDifference(segmentRegression[i][0], segmentRegression2[i][0], (allSegments2[i][0], allSegments2[i][2])) for i in range(len(allSegments))]
+    return [integralDifference(segmentRegression[i][0], segmentRegression2[i][0], (allSegments[i][0], allSegments[i][2]), (allSegments2[i][0], allSegments2[i][2])) for i in range(len(allSegments))]
 
 def cubicPlot(allSegments, polynomialRegression, numPoints=100, color='red', label='Segments'):
     for i in range(len(allSegments)):

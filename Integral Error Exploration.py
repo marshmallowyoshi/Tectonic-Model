@@ -2,8 +2,6 @@ import numpy as np
 import pandas as pd
 import algorithm as alg
 import matplotlib.pyplot as plt
-from scipy import integrate
-import scipy
 
 name = 'R2 H3'
 name = 'data/' + name + '.csv'
@@ -17,10 +15,9 @@ y = np.asarray(df.iloc[:,3])
 
 
 allSegments, polynomialRegression = alg.fullSegmentAnalysis(x,y, name=name, peakRateThreshold=0.03, join=True, segmentMode='poly', plot=False)
-x_2 = alg.reduceDataDecimate(x, 4)
-y_2 = alg.reduceDataDecimate(y, 4)
+x_2, y_2 = alg.resampleToPeak(x, y, sample_rate_override=len(x)/4)
 allSegments2, polynomialRegression2 = alg.fullSegmentAnalysis(x_2,y_2, name=name, peakRateThreshold=0.03, join=True, segmentMode='poly', plot=False)
-area = alg.integralDifference(polynomialRegression[0][0], polynomialRegression2[0][0], (allSegments[0][0],allSegments[0][2]))
+area = alg.integralDifference(polynomialRegression[0][0], polynomialRegression2[0][0], (allSegments[0][0],allSegments[0][2]), (allSegments2[0][0],allSegments2[0][2]))
 allAreas = alg.allSegmentsIntegral(allSegments, allSegments2, polynomialRegression, polynomialRegression2)
 
 totalDiff = 100 * np.asarray(allAreas)[:,1].sum()/np.asarray(allAreas)[:,2].sum()
@@ -44,7 +41,7 @@ xResampled, yResampled = alg.resampleToPeak(x,y)
 x_2Resampled, y_2Resampled = alg.resampleToPeak(x_2,y_2)
 alg.cubicPlot(allSegments, polynomialRegression, label='Original', color='red')
 alg.cubicPlot(allSegments2, polynomialRegression2, label='Reduced', color='blue')
-plt.plot(np.arange(250), y_2Resampled, color='black', label='Raw Data')
+# plt.plot(np.arange(250), y_2Resampled, color='black', label='Raw Data')
 # plt.plot(np.arange(2500),y_2Resampled, color='green', label='Reduced Data')
 # for i in range(len(allSegments)):
 #     xPlot1 = np.linspace(0, allSegments[i][2]-allSegments[i][0], 250)
