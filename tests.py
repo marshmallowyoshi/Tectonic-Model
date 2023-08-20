@@ -1,4 +1,3 @@
-import algorithm as alg
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -7,6 +6,7 @@ import math
 import scipy.special as sp
 import scipy.optimize as opt
 from scipy import stats
+import algorithm as alg
 
 name = 'R2 H3'
 name = 'data/' + name + '.csv'

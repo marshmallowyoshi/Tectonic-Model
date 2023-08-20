@@ -1,0 +1,6 @@
+{
+    "pylint.args": [
+        "--variable-naming-style=camelCase",
+        "--function-naming-style=camelCase"
+    ]
+}
