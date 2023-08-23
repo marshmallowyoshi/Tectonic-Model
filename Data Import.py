@@ -48,16 +48,35 @@ def batchAnalysis(rawData):
             plt.savefig('figures\\analysis\\' + key + '.png', dpi='figure', bbox_inches='tight', format=None)
             plt.clf()
 
-def batchMinimum(rawData):
+def batchMinimum(rawData,
+                 peak_rate_threshold=0.04,
+                 resampling_kind='quadratic',
+                 samples_per_period=1300,
+                 sampling_period=1):
+    peak_rate_threshold = 0.04
     errorData = []
     for key, value in rawData.items():
         if isinstance(value, dict):
             for key2, value2 in value.items():
-                error = alg.findMinimumSampleRate(value2[0], value2[1], name=key + ' ' + key2)
+                error = alg.findMinimumSampleRate(value2[0], value2[1], 
+                                                  name=key + ' ' + key2, 
+                                                  plot=False, 
+                                                  verbose=False, 
+                                                  resampling_kind=resampling_kind, 
+                                                  peakRateThreshold=peak_rate_threshold,
+                                                  samples_per_period=samples_per_period,
+                                                  sampling_period=sampling_period)
                 errorData.append((key + ' ' + key2, error))
 
         else:
-            error = alg.findMinimumSampleRate(value[0], value[1], name=key)
+            error = alg.findMinimumSampleRate(value[0], value[1], 
+                                              name=key, 
+                                              plot=False, 
+                                              verbose=False, 
+                                              resampling_kind=resampling_kind, 
+                                              peakRateThreshold=peak_rate_threshold,
+                                              samples_per_period=samples_per_period,
+                                              sampling_period=sampling_period)
             errorData.append((key, error))
     return errorData
 
@@ -136,10 +155,38 @@ for key, value in rawData.items():
     else:
         rawData[key] = standardForm(value)
 
-with open('rawData.txt', 'w') as f:
-    f.write(str(batchMinimum(rawData)))
+key = 'BF1 H2.csv'
+newdf = pd.DataFrame({'dataset': key, 'x': rawData[key][0], 'y': rawData[key][1]})
+print(newdf.head())
 
 
-# x, y = standardForm(rawData['Roller 1 analysis.csv'])
-# alg.fullSegmentAnalysis(x,y, plot=True, join=True, segmentMode='poly', peakRateThreshold=0.03)
-# plt.show()
+final_dataframe = pd.DataFrame({'dataset': [], 'x': [], 'y': []})
+for key, value in rawData.items():
+    if isinstance(value, dict):
+        for key2, value2 in value.items():
+            final_dataframe = pd.concat([final_dataframe, pd.DataFrame({'dataset': key + ' ' + key2, 'x': value2[0], 'y': value2[1]})])
+    else:
+        final_dataframe = pd.concat([final_dataframe, pd.DataFrame({'dataset': key, 'x': value[0], 'y': value[1]})])
+
+final_dataframe.to_csv('final_dataframe.csv')
+
+peak_rate_threshold=0.04
+resampling_kind='quadratic'
+samples_per_period=1300
+sampling_period=1
+
+batchResults = batchMinimum(rawData,
+                            peak_rate_threshold=peak_rate_threshold,
+                            resampling_kind=resampling_kind,
+                            samples_per_period=samples_per_period,
+                            sampling_period=sampling_period)
+df = pd.DataFrame(batchResults, columns=['Dataset', 'Error'])
+
+df[['Per Large Fault Error', 'Per Lost Fault Error', 'Total Length Error']] = pd.DataFrame(df['Error'].tolist(), index=df.index)
+
+df.to_csv(str('results ' + 
+              'kind=' + resampling_kind + 
+              ' peakratethreshold=' + str(peak_rate_threshold) + 
+              ' samplesperperiod=' + str(samples_per_period) + 
+              ' samplingperiod=' + str(sampling_period) + 
+              '.csv'))
