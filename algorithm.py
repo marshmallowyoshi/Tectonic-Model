@@ -210,8 +210,6 @@ def fullSegmentAnalysis(x, y,
         Returns a list of estimated segments, with their start, peak and end points. 
         Poly mode also returns a list of polynomial regression models for each segment."""
     x, y = resampleToPeak(x, y, wtype=wtype, bands=bands, sampling_period=sampling_period, samples_per_period=samples_per_period, kind=resampling_kind)
-    # x = resample(x, int(peakWavelength*100))
-    # y = resample(y, int(peakWavelength*100))
     
     allSegments = []
     ignoredRanges = []
@@ -494,9 +492,23 @@ def findMinimumSampleRate(x, y,
                                         kind=resampling_kind)
         else:
             print('Error: samplingMode not recognised')
-        # fullSegmentAnalysis(xNew,yNew, name=name, peakRateThreshold=peakRateThreshold, join=True, segmentMode='poly', plot=True)
-        # plt.show()
-    return (percentage, percentageSmall, percentageTotal)
+    
+    segmentLineFirst = []
+    segmentLineSecond = []
+    segmentMax = allSegmentsFull[-1][-1]
+    for segment in allSegmentsFull:
+        segmentLineFirst.append(segment[0])
+        segmentLineFirst.append(segment[2])
+    for segment in oldSegments:
+        segmentLineSecond.append(segment[0])
+        segmentLineSecond.append(segment[2])
+    
+    segmentLineFirst = np.asarray(segmentLineFirst)
+    segmentLineSecond = np.asarray(segmentLineSecond)
+    segmentLineSecond = interp1d(range(len(segmentLineSecond)),segmentLineSecond)(range(len(segmentLineFirst)))
+
+    segmentError = np.sum(np.abs(-segmentLineFirst)/segmentMax)
+    return (percentage, percentageSmall, percentageTotal, segmentError)
 
 def integralDifference(poly1, poly2, bounds1, bounds2):
     """ Returns the percentage difference between the integrals of two polynomials

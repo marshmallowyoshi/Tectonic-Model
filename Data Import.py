@@ -182,7 +182,10 @@ batchResults = batchMinimum(rawData,
                             sampling_period=sampling_period)
 df = pd.DataFrame(batchResults, columns=['Dataset', 'Error'])
 
-df[['Per Large Fault Error', 'Per Lost Fault Error', 'Total Length Error']] = pd.DataFrame(df['Error'].tolist(), index=df.index)
+df[['Per Large Fault Error', 
+    'Per Lost Fault Error', 
+    'Total Length Error', 
+    'Intersect Sample Error']] = pd.DataFrame(df['Error'].tolist(), index=df.index)
 
 df.to_csv(str('results ' + 
               'kind=' + resampling_kind + 
