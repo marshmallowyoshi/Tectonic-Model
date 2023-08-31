@@ -20,7 +20,7 @@ allSegments2, polynomialRegression2 = alg.fullSegmentAnalysis(x_2,y_2, name=name
 area = alg.integralDifference(polynomialRegression[0][0], polynomialRegression2[0][0], (allSegments[0][0],allSegments[0][2]), (allSegments2[0][0],allSegments2[0][2]))
 allAreas = alg.allSegmentsIntegral(allSegments, allSegments2, polynomialRegression, polynomialRegression2)
 
-totalDiff = 100 * np.asarray(allAreas)[:,1].sum()/np.asarray(allAreas)[:,2].sum()
+totalDiff = allAreas[1]*100
 print(np.round(totalDiff,2), "%", sep="")
 
 # numPoints = 100
@@ -41,6 +41,9 @@ xResampled, yResampled = alg.resampleToPeak(x,y)
 x_2Resampled, y_2Resampled = alg.resampleToPeak(x_2,y_2)
 alg.cubicPlot(allSegments, polynomialRegression, label='Original', color='red')
 alg.cubicPlot(allSegments2, polynomialRegression2, label='Reduced', color='blue')
+
+modulus_error = alg.modulusError(x, y, x_2, y_2)[1]*100
+print(modulus_error)
 # plt.plot(np.arange(250), y_2Resampled, color='black', label='Raw Data')
 # plt.plot(np.arange(2500),y_2Resampled, color='green', label='Reduced Data')
 # for i in range(len(allSegments)):

@@ -369,12 +369,12 @@ def findMinimumSampleRate(x, y,
                           sampling_period=0.1, 
                           wtype='mexh', 
                           name='Unknown', 
-                          peakRateThreshold=0.03, 
-                          degree=3, 
+                          peakRateThreshold=0.03,
                           plot=False, 
                           verbose=False, 
-                          resampling_kind='linear'):
-    allSegmentsFull = fullSegmentAnalysis(x,y, 
+                          resampling_kind='linear',
+                          get_error=False):
+    allSegmentsFull, segmentRegressionFull = fullSegmentAnalysis(x,y, 
                                           bands=bands, 
                                           samples_per_period=samples_per_period,
                                           sampling_period=sampling_period, 
@@ -382,18 +382,38 @@ def findMinimumSampleRate(x, y,
                                           name=name, 
                                           peakRateThreshold=peakRateThreshold, 
                                           join=True, 
-                                          segmentMode='flat')
-    xNew = x
-    yNew = y
+                                          segmentMode='poly')
+    xNew = x.copy()
+    yNew = y.copy()
 
     sampleFactor = 1
     segmentCount = 0
+    if get_error is True:
+        integral_error = []
+        modulus_error = []
+        modulus_error.append(modulusError(x, y, xNew, yNew))
+        integral_error.append(allSegmentsIntegral(allSegmentsFull, allSegmentsFull, segmentRegressionFull, segmentRegressionFull))
+    sample_rates = []
+    sample_rates.append(int(len(x) * 0.9**(sampleFactor-1)))
     while True:
+        
+        
         # Gradual increase in sample reduction
         sampleFactor = sampleFactor+1
-        
+
+        if get_error is True:
+            x_temp, y_temp = resampleToPeak(x, y, 
+                                        wtype=wtype, 
+                                        bands=bands, 
+                                        samples_per_period=samples_per_period,
+                                        sampling_period=sampling_period, 
+                                        sample_rate_override=int(len(x) * 0.9**(sampleFactor-1)), 
+                                        kind=resampling_kind)
+            modulus_error.append(modulusError(x, y, x_temp, y_temp))
+        sample_rates.append(int(len(x) * 0.9**(sampleFactor-1)))
+
         # print('Number of Samples: ', len(xNew))
-        allSegments = fullSegmentAnalysis(xNew,yNew, 
+        allSegments, segmentsRegression = fullSegmentAnalysis(xNew,yNew, 
                                           bands=bands, 
                                           samples_per_period=samples_per_period,
                                           sampling_period=sampling_period, 
@@ -401,9 +421,13 @@ def findMinimumSampleRate(x, y,
                                           name=name, 
                                           peakRateThreshold=peakRateThreshold, 
                                           join=True, 
-                                          segmentMode='flat', 
+                                          segmentMode='poly', 
                                           plot=False, 
                                           resampling_kind=resampling_kind)
+        # integral error
+        if get_error is True:
+            integral_error.append(allSegmentsIntegral(allSegmentsFull, allSegments, segmentRegressionFull, segmentsRegression))
+
         if verbose is True:
             print('Number of Segments: ', len(allSegments))
         if len(allSegments) < len(allSegmentsFull) or len(xNew) < 4:
@@ -421,7 +445,7 @@ def findMinimumSampleRate(x, y,
                                                       bands=bands, 
                                                       samples_per_period=samples_per_period,
                                                       sampling_period=sampling_period, 
-                                                      sample_rate_override=int(len(x) * 0.9**(sampleFactor-3)), 
+                                                      sample_rate_override=int(len(x) * 0.9**(sampleFactor-2)), 
                                                       kind=resampling_kind)
             else:
                 print('Warning: samplingMode not recognised')
@@ -493,22 +517,14 @@ def findMinimumSampleRate(x, y,
         else:
             print('Error: samplingMode not recognised')
     
-    segmentLineFirst = []
-    segmentLineSecond = []
-    segmentMax = allSegmentsFull[-1][-1]
-    for segment in allSegmentsFull:
-        segmentLineFirst.append(segment[0])
-        segmentLineFirst.append(segment[2])
-    for segment in oldSegments:
-        segmentLineSecond.append(segment[0])
-        segmentLineSecond.append(segment[2])
     
-    segmentLineFirst = np.asarray(segmentLineFirst)
-    segmentLineSecond = np.asarray(segmentLineSecond)
-    segmentLineSecond = interp1d(range(len(segmentLineSecond)),segmentLineSecond)(range(len(segmentLineFirst)))
-
-    segmentError = np.sum(np.abs(-segmentLineFirst)/segmentMax)
-    return (percentage, percentageSmall, percentageTotal, segmentError)
+    if get_error is True:
+        intersect_error = [i[2] if i != None else 0 for i in integral_error]
+        integral_error = [i[1] if i != None else 0 for i in integral_error]
+        modulus_error = [i[1] if i != None else 0 for i in modulus_error]
+        return (percentage, percentageSmall, percentageTotal, sample_rates, integral_error, modulus_error, intersect_error)
+    else:
+        return (percentage, percentageSmall, percentageTotal, sample_rates)
 
 def integralDifference(poly1, poly2, bounds1, bounds2):
     """ Returns the percentage difference between the integrals of two polynomials
@@ -539,9 +555,9 @@ def integralDifference(poly1, poly2, bounds1, bounds2):
     difference_1 = quad(lambda x: cubicAbs(x, coeffs_1[0], coeffs_1[1], coeffs_1[2], coeffs_1[3], offset=offset1), 0, bounds[1]-bounds[0])
     difference_2 = quad(lambda x: cubicAbs(x, coeffs_2[0], coeffs_2[1], coeffs_2[2], coeffs_2[3], offset=offset2), 0, bounds[1]-bounds[0])
     
-    areaDifferencePercentage = 100 * areaDifference[0]/np.max([difference_1[0], difference_2[0]])
+    areaDifferenceRatio = areaDifference[0]/np.max([difference_1[0], difference_2[0]])
 
-    return (areaDifferencePercentage, areaDifference[0], difference_1[0], difference_2[0])
+    return (areaDifferenceRatio, areaDifference[0], difference_1[0], difference_2[0])
 
 def cubicAbs(x,cube,square,linear,constant,offset=0):
     """ Returns the absolute value of a cubic polynomial"""
@@ -552,7 +568,9 @@ def cubicAbsDiff(x,cube1,square1,linear1,constant1,cube2,square2,linear2,constan
     return np.abs(cube1*(x+offset1)**3 + square1*(x+offset1)**2 + linear1*(x+offset1) + constant1 - (cube2*(x+offset2)**3 + square2*(x+offset2)**2 + linear2*(x+offset2) + constant2))
 
 def allSegmentsIntegral(allSegments, allSegments2, segmentRegression, segmentRegression2):
-    return [integralDifference(segmentRegression[i][0], segmentRegression2[i][0], (allSegments[i][0], allSegments[i][2]), (allSegments2[i][0], allSegments2[i][2])) for i in range(len(allSegments))]
+    allSegments, allSegments2, segmentRegression, segmentRegression2, intersectError = faultMatchup(allSegments, allSegments2, segmentRegression, segmentRegression2)
+    all_differences = [integralDifference(segmentRegression[i][0], segmentRegression2[i][0], (allSegments[i][0], allSegments[i][2]), (allSegments2[i][0], allSegments2[i][2])) for i in range(len(allSegments))]
+    return (all_differences, np.sum([i[1] for i in all_differences])/np.sum([i[2] for i in all_differences]), intersectError) 
 
 def cubicPlot(allSegments, polynomialRegression, numPoints=100, color='red', label='Segments'):
     for i in range(len(allSegments)):
@@ -565,3 +583,82 @@ def cubicPlot(allSegments, polynomialRegression, numPoints=100, color='red', lab
         else:
             plt.plot(xPlot, yPlot, color=color)
     return None
+
+def modulusError(x, y, x2, y2):
+    x = np.asarray(x)
+    y = np.asarray(y)
+    x2 = np.asarray(x2)
+    y2 = np.asarray(y2)
+
+    x = x[x <= np.max(x2)]
+
+
+    y = y[0:len(x)]
+    f = interp1d(x2, y2, kind='linear')
+    y2 = f(x)
+    x2 = x
+
+
+    x_diff = x
+    y_diff = np.abs(y-y2)
+    modulus_error = np.trapz(y_diff, x_diff)
+    return (modulus_error, modulus_error/np.trapz(y, x))
+
+def faultMatchup(allSegments, allSegments2, segmentRegression, segmentRegression2):
+    if len(allSegments) == len(allSegments2):
+        intersectError = np.mean([np.abs(allSegments[i][0] - allSegments2[i][0])/np.max([allSegments[i][2]-allSegments[i][0],allSegments2[i][2]-allSegments[i][0]]) for i in range(len(allSegments))])
+    else:
+        newLength = np.min([len(allSegments), len(allSegments2)])
+
+        startPoints = [i[0] for i in allSegments]
+        startPoints2 = [i[0] for i in allSegments2]
+
+        newSegments = {key: None for key in range(newLength)}
+        newSegments2 = {key: None for key in range(newLength)}
+        
+        newSegmentRegression = {key: None for key in range(newLength)}
+        newSegmentRegression2 = {key: None for key in range(newLength)}
+
+        intersectError = np.zeros(newLength)
+
+        if len(allSegments) > len(allSegments2):
+            startPointsTemp = startPoints.copy()
+            for idx, point in enumerate(startPoints2):
+                newPoint = closestArg(startPoints, point)
+                newSegments[idx] = allSegments[newPoint]
+                newSegments2[idx] = allSegments2[idx]
+                newSegmentRegression[idx] = segmentRegression[newPoint]
+                newSegmentRegression2[idx] = segmentRegression2[idx]
+                startPointsTemp[newPoint] = np.nan
+                intersectError[idx] = np.abs(newSegments[idx][0] - newSegments2[idx][0])/np.max([newSegments[idx][2]-newSegments[idx][0], newSegments2[idx][2]-newSegments2[idx][0]])
+
+            for point in startPointsTemp:
+                if np.isnan(point) == False:
+                    intersectError = np.concatenate((intersectError, np.ones(1)))
+            
+
+        if len(allSegments) < len(allSegments2):
+            startPoints2Temp = startPoints2.copy()
+            for idx, point in enumerate(startPoints):
+                newPoint = closestArg(startPoints2, point)
+                newSegments2[idx] = allSegments2[newPoint]
+                newSegments[idx] = allSegments[idx]
+                newSegmentRegression2[idx] = segmentRegression2[newPoint]
+                newSegmentRegression[idx] = segmentRegression[idx]
+                startPoints2Temp[newPoint] = np.nan
+                intersectError[idx] = np.abs(newSegments[idx][0] - newSegments2[idx][0])/np.max([newSegments[idx][2]-newSegments[idx][0], newSegments2[idx][2]-newSegments2[idx][0]])
+
+            for point in startPoints2Temp:
+                if np.isnan(point) == False:
+                    intersectError = np.concatenate((intersectError, np.ones(1)))
+        intersectError = np.mean(intersectError)
+        
+
+
+        allSegments = list(newSegments.values())
+        allSegments2 = list(newSegments2.values())
+        segmentRegression = list(newSegmentRegression.values())
+        segmentRegression2 = list(newSegmentRegression2.values())
+            
+
+    return allSegments, allSegments2, segmentRegression, segmentRegression2, intersectError

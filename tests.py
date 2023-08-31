@@ -8,12 +8,12 @@ import scipy.optimize as opt
 from scipy import stats
 import algorithm as alg
 
-name = 'L2 H4-1'
+name = 'BF2 H2'
 name = 'data/' + name + '.csv'
 df = pd.read_csv(name)
 x = np.asarray(df.iloc[:,0])
 y = np.asarray(df.iloc[:,3])
-
+x, y = alg.resampleToPeak(x, y, sample_rate_override=0.9*len(x), kind='quadratic')
 peakRateThreshold = 0.04
 contWav = alg.waveletGen(x,y)
 allSegments = alg.fullSegmentAnalysis(x,y, 

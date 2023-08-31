@@ -65,7 +65,8 @@ def batchMinimum(rawData,
                                                   resampling_kind=resampling_kind, 
                                                   peakRateThreshold=peak_rate_threshold,
                                                   samples_per_period=samples_per_period,
-                                                  sampling_period=sampling_period)
+                                                  sampling_period=sampling_period,
+                                                  get_error=True)
                 errorData.append((key + ' ' + key2, error))
 
         else:
@@ -76,9 +77,42 @@ def batchMinimum(rawData,
                                               resampling_kind=resampling_kind, 
                                               peakRateThreshold=peak_rate_threshold,
                                               samples_per_period=samples_per_period,
-                                              sampling_period=sampling_period)
+                                              sampling_period=sampling_period,
+                                              get_error=True)
             errorData.append((key, error))
     return errorData
+
+def exportBatchMinimum(peak_rate_threshold=0.04,
+                       resampling_kind='quadratic',
+                       samples_per_period=1300,
+                       sampling_period=1,):
+    batchResults = batchMinimum(rawData,
+                            peak_rate_threshold=peak_rate_threshold,
+                            resampling_kind=resampling_kind,
+                            samples_per_period=samples_per_period,
+                            sampling_period=sampling_period)
+    df = pd.DataFrame(batchResults, columns=['Dataset', 'Error'])
+
+    df[['Per Large Fault Error', 
+        'Per Lost Fault Error', 
+        'Total Length Error',
+        'Sample Counts',
+        'Integral Error',
+        'Modulus Error',
+        'Intersect Error']] = pd.DataFrame(df['Error'].tolist(), index=df.index)
+    
+    df = df.drop(columns=['Error'])
+
+    # df['Integral Error'] = df['Integral Error'].apply(lambda x: [i[1] for i in x])
+    # df['Modulus Error'] = df['Modulus Error'].apply(lambda x: [i[1] for i in x])
+
+    df.to_csv(str('results with error progression ' + 
+                'kind=' + resampling_kind + 
+                ' peakratethreshold=' + str(peak_rate_threshold) + 
+                ' samplesperperiod=' + str(samples_per_period) + 
+                ' samplingperiod=' + str(sampling_period) + 
+                '.csv'))
+    return df
 
 dataNames = enumerateFiles('data')
 
@@ -175,21 +209,7 @@ resampling_kind='quadratic'
 samples_per_period=1300
 sampling_period=1
 
-batchResults = batchMinimum(rawData,
-                            peak_rate_threshold=peak_rate_threshold,
-                            resampling_kind=resampling_kind,
-                            samples_per_period=samples_per_period,
-                            sampling_period=sampling_period)
-df = pd.DataFrame(batchResults, columns=['Dataset', 'Error'])
-
-df[['Per Large Fault Error', 
-    'Per Lost Fault Error', 
-    'Total Length Error', 
-    'Intersect Sample Error']] = pd.DataFrame(df['Error'].tolist(), index=df.index)
-
-df.to_csv(str('results ' + 
-              'kind=' + resampling_kind + 
-              ' peakratethreshold=' + str(peak_rate_threshold) + 
-              ' samplesperperiod=' + str(samples_per_period) + 
-              ' samplingperiod=' + str(sampling_period) + 
-              '.csv'))
+exportBatchMinimum(peak_rate_threshold=peak_rate_threshold,
+                       resampling_kind=resampling_kind,
+                       samples_per_period=samples_per_period,
+                       sampling_period=sampling_period,)
