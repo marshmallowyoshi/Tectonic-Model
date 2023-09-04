@@ -394,7 +394,7 @@ def findMinimumSampleRate(x, y,
         modulus_error.append(modulusError(x, y, xNew, yNew))
         integral_error.append(allSegmentsIntegral(allSegmentsFull, allSegmentsFull, segmentRegressionFull, segmentRegressionFull))
     sample_rates = []
-    sample_rates.append(int(len(x) * 0.9**(sampleFactor-1)))
+    # sample_rates.append(int(len(x) * 0.9**(sampleFactor-1)))
     while True:
         
         
@@ -407,10 +407,10 @@ def findMinimumSampleRate(x, y,
                                         bands=bands, 
                                         samples_per_period=samples_per_period,
                                         sampling_period=sampling_period, 
-                                        sample_rate_override=int(len(x) * 0.9**(sampleFactor-1)), 
+                                        sample_rate_override=int(len(x) * 0.9**(sampleFactor-2)), 
                                         kind=resampling_kind)
             modulus_error.append(modulusError(x, y, x_temp, y_temp))
-        sample_rates.append(int(len(x) * 0.9**(sampleFactor-1)))
+        sample_rates.append(int(len(x) * 0.9**(sampleFactor-2)))
 
         # print('Number of Samples: ', len(xNew))
         allSegments, segmentsRegression = fullSegmentAnalysis(xNew,yNew, 
@@ -445,7 +445,7 @@ def findMinimumSampleRate(x, y,
                                                       bands=bands, 
                                                       samples_per_period=samples_per_period,
                                                       sampling_period=sampling_period, 
-                                                      sample_rate_override=int(len(x) * 0.9**(sampleFactor-2)), 
+                                                      sample_rate_override=int(len(x) * 0.9**(sampleFactor-3)), 
                                                       kind=resampling_kind)
             else:
                 print('Warning: samplingMode not recognised')
@@ -567,10 +567,33 @@ def cubicAbsDiff(x,cube1,square1,linear1,constant1,cube2,square2,linear2,constan
     """ Returns the absolute value of the difference between two cubic polynomials with offset values"""
     return np.abs(cube1*(x+offset1)**3 + square1*(x+offset1)**2 + linear1*(x+offset1) + constant1 - (cube2*(x+offset2)**3 + square2*(x+offset2)**2 + linear2*(x+offset2) + constant2))
 
-def allSegmentsIntegral(allSegments, allSegments2, segmentRegression, segmentRegression2):
-    allSegments, allSegments2, segmentRegression, segmentRegression2, intersectError = faultMatchup(allSegments, allSegments2, segmentRegression, segmentRegression2)
-    all_differences = [integralDifference(segmentRegression[i][0], segmentRegression2[i][0], (allSegments[i][0], allSegments[i][2]), (allSegments2[i][0], allSegments2[i][2])) for i in range(len(allSegments))]
-    return (all_differences, np.sum([i[1] for i in all_differences])/np.sum([i[2] for i in all_differences]), intersectError) 
+def allSegmentsIntegral(allSegments, allSegments2, segmentRegression, segmentRegression2, include_unmatched=True):
+    allSegmentsMatch, allSegments2Match, segmentRegressionMatch, segmentRegression2Match, intersectError = faultMatchup(allSegments, allSegments2, segmentRegression, segmentRegression2)
+
+    # Error for unmatched faults
+    if include_unmatched is True:
+        unMatched = []
+        if len(segmentRegressionMatch) != len(segmentRegression):
+            for idx, curve in enumerate(segmentRegression):
+                if curve not in segmentRegressionMatch:
+                    coeffs_1 = np.asarray(list(curve[0].coef_)[::-1] + [curve[0].intercept_])
+                    unMatched.append(quad(lambda x: cubicAbs(x, coeffs_1[0], coeffs_1[1], coeffs_1[2], coeffs_1[3], offset=allSegments[idx][0]), 0, allSegments[idx][2]-allSegments[idx][0])[0])
+        if len(segmentRegression2Match) != len(segmentRegression2):
+            for idx, curve in enumerate(segmentRegression2):
+                if curve not in segmentRegression2Match:
+                    coeffs_1 = np.asarray(list(curve[0].coef_)[::-1] + [curve[0].intercept_])
+                    unMatched.append(quad(lambda x: cubicAbs(x, coeffs_1[0], coeffs_1[1], coeffs_1[2], coeffs_1[3], offset=allSegments2[idx][0]), 0, allSegments2[idx][2]-allSegments2[idx][0])[0])
+
+
+    # integral differences
+    all_differences = [integralDifference(segmentRegressionMatch[i][0], segmentRegression2Match[i][0], (allSegmentsMatch[i][0], allSegmentsMatch[i][2]), (allSegments2Match[i][0], allSegments2Match[i][2])) for i in range(len(allSegmentsMatch))]
+
+    # split up list
+    all_errors = [i[1] for i in all_differences] + unMatched
+    all_areas = [i[2] for i in all_differences] + unMatched
+    
+
+    return (all_differences, np.sum(all_errors)/np.sum(all_areas), intersectError) 
 
 def cubicPlot(allSegments, polynomialRegression, numPoints=100, color='red', label='Segments'):
     for i in range(len(allSegments)):

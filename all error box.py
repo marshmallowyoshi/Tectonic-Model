@@ -15,12 +15,15 @@ final_modulus_error = df['Modulus Error'].apply(lambda x: x[-1]*100)
 
 final_intersect_error = df['Intersect Error'].apply(lambda x: x[-1]*100)
 
-bad_index = final_integral_error[(final_integral_error > 100) | (final_integral_error < 0)] + final_modulus_error[(final_modulus_error > 100) | (final_integral_error < 0)]
+sample_rate_change = df['Sample Counts'].apply(lambda x: 100*(1-(x[-1]/x[0])))
+
+bad_index = final_integral_error[(final_integral_error > 100) | (final_integral_error <= 0)] + final_modulus_error[(final_modulus_error > 100) | (final_integral_error <= 0)] + sample_rate_change[sample_rate_change == 0]
 final_integral_error = final_integral_error.drop(bad_index.index)
 final_modulus_error = final_modulus_error.drop(bad_index.index)
 final_intersect_error = final_intersect_error.drop(bad_index.index)
+sample_rate_change = sample_rate_change.drop(bad_index.index)
 
-sample_rate_change = df['Sample Counts'].apply(lambda x: 100*(1-(x[-1]/x[0])))
+
 
 
 print('integral', np.mean(final_integral_error))

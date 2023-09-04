@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import plotly.graph_objects as go
-df = pd.read_csv('results long peakratethreshold=0.04.csv')
+df = pd.read_csv('results with error progression kind=quadratic peakratethreshold=0.04 samplesperperiod=1300 samplingperiod=1.csv')
 rawdf = pd.read_csv('final_dataframe.csv')
 
 # plt.scatter(np.arange(len(df['Total Length Error'])),df['Total Length Error'])
