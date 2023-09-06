@@ -8,7 +8,7 @@ import scipy.optimize as opt
 from scipy import stats
 import algorithm as alg
 
-name = 'BF2 H2'
+name = 'L2 H4-1'
 name = 'data/' + name + '.csv'
 df = pd.read_csv(name)
 x = np.asarray(df.iloc[:,0])

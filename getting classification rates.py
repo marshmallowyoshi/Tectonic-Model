@@ -33,7 +33,7 @@ for index, i in enumerate((lost_fault, large_fault, total_length)):
 
     lost_fault_list_strings = [str(np.round(i, 4)) for i in lost_fault_list]
     lost_fault_list_strings[critical_point] = str(">>> " + str(lost_fault_list_strings[critical_point]) + " <<<")
-    print(lost_fault_list[critical_point])
+    print(lost_fault_list_strings)
     for i in lost_fault_list:
         ax[index].axvline(x=i, color='w', alpha=0.06)
     ax[index].axvline(x=lost_fault_list[critical_point], color=colors[index], alpha=0.8, label=str("5% of " + names[index]))

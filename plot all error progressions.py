@@ -49,12 +49,12 @@ total_fault = df['Total Length Error'].drop(bad_index.index)
 # plt.title(str(stats.pearsonr(final_integral_error, total_fault).correlation))
 # plt.show()
 
-
+plt.rcParams['figure.dpi'] = 150
 fig, ax = plt.subplots(3,3)
 
 integral_color = 'red'
 modulus_color = 'lightblue'
-intersect_color = 'green'
+intersect_color = 'lightgreen'
 
 lost_color = 'magenta'
 large_color = 'cyan'
@@ -129,8 +129,9 @@ fig.tight_layout()
 plt.show()
 
 
-
-
+# print(np.sqrt(np.var(final_integral_error)))
+# print(np.sqrt(np.var(final_modulus_error)))
+# print(np.sqrt(np.var(final_intersect_error)))
 
 
 
@@ -152,7 +153,7 @@ plt.show()
 # plt.margins(x=0, y=0)
 # plt.show()
 
-# print(np.corrcoef(final_integral_error, final_modulus_error)[0,1])
+print(np.corrcoef(final_integral_error, final_modulus_error)[0,1])
 # plt.scatter(final_integral_error, final_modulus_error, color='black', marker='x', s=2)
 # # plt.axvline(np.median(final_integral_error), color='blue', label=str('Integral Error Median: ' + str(np.round(np.median(final_integral_error), 3)) + '%'))
 # # plt.axhline(np.median(final_modulus_error), color='blue', label=str('Modulus Error Median: ' + str(np.round(np.median(final_modulus_error), 3)) + '%'))

@@ -4,15 +4,14 @@ import matplotlib.pyplot as plt
 import scipy.signal as sig
 import algorithm as alg
 
-name = 'L2 H4-1'
-nameShort = str(name)
+name = 'part4'
 name = 'data/' + name + '.csv'
 
 df = pd.read_csv(name)
 
 x = np.asarray(df.iloc[:,0])
 y = np.asarray(df.iloc[:,3])
-x2, y2 = x, y
+x2, y2 = alg.resampleToPeak(x,y, sample_rate_override=31)
 allSegments, segmentRegression = alg.fullSegmentAnalysis(x2,y2,
                                                             plot=False,
                                                             skip_wavelets=True,
@@ -39,29 +38,15 @@ allSegments2, segmentRegression2 = alg.fullSegmentAnalysis(x3,y3,
                                                             title='short',
                                                             name=name)
 contWav = alg.waveletGen(x,y)
-
-plt.rcParams['figure.dpi'] = 300
-fig, ax = plt.subplots(1, 1)
-x4, y4 = alg.resampleToPeak(x,y, samples_per_period=1300, sampling_period=1, bands=(1,31))
-ax.plot(np.arange(len(y4)), y4, color='black', label='Raw Data')
-
-for index, segment in enumerate(allSegments):
-    y_predicted = segmentRegression[index][0].predict(segmentRegression[index][2])
-    if index == 0:
-        ax.plot(segmentRegression[index][1] + segment[0], y_predicted, color='red', label='Original', linewidth=3)
-    else:
-        ax.plot(segmentRegression[index][1] + segment[0], y_predicted, color='red', linewidth=3)
     
+fig, ax = plt.subplots(1, 1)
 
-# for index, segment in enumerate(allSegments2):
-#     y_predicted = segmentRegression2[index][0].predict(segmentRegression2[index][2])
-#     if index == 0:
-#         ax.plot(segmentRegression2[index][1] + segment[0], y_predicted, color='blue', label='Reduced')
-#     else:
-#         ax.plot(segmentRegression2[index][1] + segment[0], y_predicted, color='blue')
-# fig.legend(bbox_to_anchor=(0.99,0.91), loc='upper right', ncol=1, borderaxespad=0., fontsize=10)
+
+ax.plot(x2,y2, color='red', label='Before')
+ax.plot(x3,y3, color='blue', label='After')
+
+fig.legend(bbox_to_anchor=(0.99,0.91), loc='upper right', ncol=1, borderaxespad=0., fontsize=10)
 ax.set_xlabel('Sample Number')
-ax.set_ylabel('Throw (m)')
-ax.set_title(nameShort)
+ax.set_ylabel('Throw')
 plt.show()
 
