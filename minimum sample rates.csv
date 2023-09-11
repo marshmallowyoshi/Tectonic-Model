@@ -1,0 +1,232 @@
+Dataset,Lost Fault,Large Fault,Total Length
+BF1 H2,50.0,4.5455,1.0204
+BF2 H2,50.0,6.6667,4.3478
+BF3 H2,20.0,7.1429,1.7241
+BF4 H2,50.0,2.8571,0.9174
+F22C1,7.6923,7.6923,7.6923
+F22C10,50.0,14.2857,5.2632
+F22C2,16.6667,11.1111,4.3478
+F22C3,50.0,12.5,2.9412
+F22C4,50.0,11.1111,2.1739
+F22C5,50.0,14.2857,2.7027
+F22C6,50.0,14.2857,3.125
+F22C7,50.0,14.2857,2.6316
+F22C8,50.0,11.1111,1.8519
+F22C9,50.0,9.0909,2.439
+F9 1,7.1429,7.1429,7.1429
+F9 2,25.0,16.6667,5.0
+F9 3,14.2857,12.5,3.3333
+F9 4,50.0,9.0909,2.9412
+F9 5,50.0,12.5,3.0303
+F9 6,50.0,5.2632,1.4085
+F9 7,50.0,14.2857,2.8571
+F9 8,50.0,6.25,2.1277
+F9 9,50.0,11.1111,1.9231
+F9 10,50.0,7.1429,1.3889
+F9 11,50.0,12.5,1.9608
+F9 12,50.0,6.25,1.2658
+F9 13,50.0,12.5,2.2222
+F9 14,50.0,4.1667,1.2987
+F9 15,50.0,7.6923,1.3699
+F9 16,50.0,7.6923,1.6949
+F9 17,50.0,9.0909,1.7544
+F9 18,50.0,4.5455,1.2346
+F9 19,50.0,10.0,2.0833
+F9 20,50.0,4.1667,0.9901
+F9 21,50.0,5.2632,1.1494
+F9 22,50.0,7.1429,1.8182
+F9 23,50.0,4.3478,1.3699
+F9 24,50.0,9.0909,1.7544
+F9 25,4.3478,4.3478,4.3478
+Keystone all 1,9.0909,9.0909,9.0909
+Keystone all 2,25.0,25.0,25.0
+Keystone all 3,20.0,20.0,20.0
+Keystone all 4,25.0,12.5,8.3333
+Keystone all 5,20.0,20.0,20.0
+Keystone all 6,8.3333,8.3333,8.3333
+Keystone all 7,20.0,20.0,20.0
+Keystone all 8,9.0909,9.0909,9.0909
+Keystone all 9,9.0909,9.0909,9.0909
+Keystone all 10,9.0909,9.0909,9.0909
+KeystoneF6 1,50.0,14.2857,2.8571
+KeystoneF6 2,50.0,4.3478,1.7241
+KeystoneF6 3,50.0,11.1111,1.6667
+KeystoneF6 4,50.0,12.5,3.7037
+KeystoneF6 5,50.0,5.5556,1.3158
+KeystoneF6 6,50.0,4.3478,1.2987
+KeystoneF6 7,50.0,10.0,1.9231
+KeystoneF6 8,50.0,3.2258,1.087
+KeystoneF6 9,50.0,5.8824,1.2987
+KeystoneF6 10,50.0,4.3478,1.0
+KeystoneF6 11,50.0,10.0,2.0
+KeystoneF6 12,50.0,4.0,1.0309
+KeystoneF6 13,50.0,3.7037,1.3158
+KeystoneF6 14,50.0,6.25,1.4706
+KeystoneF6 15,50.0,6.6667,1.2658
+KeystoneF6 16,50.0,8.3333,1.3889
+KeystoneF6 17,50.0,7.6923,1.2195
+KeystoneF6 18,50.0,5.8824,1.4085
+KeystoneF6 19,14.2857,4.7619,1.2048
+KeystoneF6 20,50.0,3.5714,0.9709
+KeystoneF6 21,50.0,5.2632,1.4085
+KeystoneF6 22,50.0,7.1429,1.4706
+KeystoneF6 23,50.0,5.5556,1.2195
+KeystoneF6 24,50.0,7.6923,1.4706
+KeystoneF6 25,50.0,7.1429,1.5385
+KeystoneF6 26,50.0,11.1111,2.3256
+KeystoneF6 27,50.0,14.2857,2.2727
+KeystoneF6 28,8.3333,8.3333,8.3333
+L2 H4-1,16.6667,1.4925,0.7634
+Linked Key&Poly Central 1,33.3333,10.0,4.1667
+Linked Key&Poly Central 2,5.5556,5.5556,5.5556
+Linked Key&Poly Central 3,20.0,14.2857,5.2632
+Linked Key&Poly Central 4,5.5556,5.5556,5.5556
+Linked Key&Poly Central 5,33.3333,10.0,5.2632
+Linked Key&Poly Central 6,50.0,5.5556,5.0
+Linked Key&Poly Central 7,25.0,14.2857,4.7619
+Linked Key&Poly Central 8,33.3333,12.5,4.7619
+Linked Key&Poly Central 9,25.0,14.2857,4.7619
+Linked Key&Poly Central 10,25.0,12.5,4.1667
+Linked Key&Poly Central 11,16.6667,9.0909,5.8824
+Linked Key&Poly Central 12,5.8824,5.8824,5.8824
+Linked Key&Poly Central 13,5.5556,5.5556,5.5556
+Linked Key&Poly Central 14,25.0,14.2857,4.7619
+Linked Key&Poly Central 15,25.0,12.5,4.3478
+Linked Key&Poly Central 16,33.3333,14.2857,4.1667
+Linked Key&Poly Central 17,16.6667,7.6923,5.2632
+Linked Key&Poly Central 18,20.0,16.6667,4.3478
+Linked Key&Poly Central 19,50.0,11.1111,3.8462
+Linked Key&Poly Central 20,5.5556,5.5556,5.5556
+Linked Key&Poly Central 21,50.0,11.1111,4.3478
+Linked Key&Poly Central 22,33.3333,11.1111,4.7619
+Linked Key&Poly Central 23,14.2857,12.5,4.5455
+Linked Key&Poly Central 24,50.0,20.0,14.2857
+Linked Key&Poly Central 25,50.0,5.8824,5.2632
+Linked Key&Poly North 1,25.0,12.5,5.2632
+Linked Key&Poly North 2,20.0,14.2857,4.1667
+Linked Key&Poly North 3,25.0,8.3333,4.5455
+Linked Key&Poly North 4,5.8824,5.8824,5.8824
+Linked Key&Poly North 5,16.6667,12.5,4.5455
+Linked Key&Poly North 6,20.0,9.0909,4.5455
+Linked Key&Poly North 7,25.0,11.1111,4.7619
+Linked Key&Poly North 8,33.3333,10.0,4.5455
+Linked Key&Poly North 9,5.8824,5.8824,5.8824
+Linked Key&Poly North 10,33.3333,11.1111,4.7619
+Linked Key&Poly South 1,33.3333,11.1111,4.3478
+Linked Key&Poly South 2,25.0,10.0,5.2632
+Linked Key&Poly South 3,33.3333,14.2857,4.7619
+Linked Key&Poly South 4,16.6667,12.5,4.5455
+Linked Key&Poly South 5,25.0,16.6667,4.7619
+Linked Key&Poly South 6,33.3333,11.1111,4.7619
+Linked Key&Poly South 7,25.0,11.1111,5.2632
+Linked Key&Poly South 8,33.3333,14.2857,4.7619
+Linked Key&Poly South 9,25.0,12.5,5.2632
+Linked Key&Poly South 10,5.5556,5.5556,5.5556
+Linked Key&Poly South 11,50.0,7.6923,5.0
+Linked Key&Poly South 12,25.0,12.5,4.1667
+Linked Key&Poly South 13,50.0,16.6667,4.3478
+Linked Key&Poly South 14,5.5556,5.5556,5.5556
+Linked Key&Poly South 15,25.0,12.5,5.5556
+Linked Key&Poly South 16,11.1111,9.0909,5.0
+Linked Key&Poly South 17,5.8824,5.8824,5.8824
+Linked Key&Poly South 18,25.0,12.5,4.1667
+Linked Key&Poly South 19,16.6667,16.6667,4.1667
+Linked Key&Poly South 20,5.5556,5.5556,5.5556
+Linked Key&Poly South 21,16.6667,12.5,4.7619
+Linked Key&Poly South 22,20.0,14.2857,5.5556
+Linked Key&Poly South 23,25.0,16.6667,5.0
+Linked Key&Poly South 24,5.5556,5.5556,5.5556
+Linked Key&Poly South 25,5.8824,5.8824,5.8824
+part4,50.0,8.3333,2.2727
+poly central 1,8.3333,8.3333,8.3333
+poly central 2,25.0,10.0,7.1429
+poly central 3,8.3333,8.3333,8.3333
+poly central 4,8.3333,8.3333,8.3333
+poly central 5,9.0909,9.0909,9.0909
+poly central 6,25.0,20.0,11.1111
+poly central 7,20.0,20.0,20.0
+poly central 8,20.0,14.2857,8.3333
+poly central 9,8.3333,8.3333,8.3333
+poly central 10,20.0,20.0,20.0
+poly central 11,14.2857,14.2857,7.1429
+poly central 12,20.0,20.0,20.0
+poly central 13,20.0,20.0,20.0
+poly central 14,20.0,11.1111,7.1429
+poly central 15,25.0,20.0,7.6923
+poly central 16,8.3333,8.3333,8.3333
+poly central 17,20.0,20.0,20.0
+poly central 18,9.0909,9.0909,9.0909
+poly central 19,9.0909,9.0909,9.0909
+poly central 20,8.3333,8.3333,8.3333
+poly central 21,20.0,20.0,20.0
+poly central 22,8.3333,8.3333,8.3333
+poly central 23,25.0,20.0,11.1111
+poly central 24,16.6667,16.6667,8.3333
+poly central 25,33.3333,16.6667,7.1429
+poly north 1,8.3333,8.3333,8.3333
+poly north 2,20.0,16.6667,9.0909
+poly north 3,25.0,20.0,11.1111
+poly north 4,9.0909,9.0909,9.0909
+poly north 5,16.6667,16.6667,16.6667
+poly north 6,8.3333,8.3333,8.3333
+poly north 7,50.0,20.0,6.25
+poly north 8,8.3333,8.3333,8.3333
+poly north 9,50.0,12.5,7.1429
+poly north 10,8.3333,8.3333,8.3333
+poly north 11,8.3333,8.3333,8.3333
+poly north 12,50.0,20.0,5.0
+poly north 13,25.0,11.1111,7.6923
+poly north 14,16.6667,12.5,7.1429
+poly north 15,20.0,20.0,20.0
+poly north 16,20.0,20.0,20.0
+poly north 17,8.3333,8.3333,8.3333
+poly north 18,8.3333,8.3333,8.3333
+poly north 19,25.0,12.5,8.3333
+poly north 20,50.0,14.2857,7.1429
+poly north 21,20.0,20.0,20.0
+poly north 22,20.0,16.6667,9.0909
+poly north 23,8.3333,8.3333,8.3333
+poly north 24,20.0,20.0,20.0
+poly north 25,16.6667,14.2857,7.6923
+poly south 1,9.0909,9.0909,9.0909
+poly south 2,20.0,20.0,20.0
+poly south 3,25.0,11.1111,7.6923
+poly south 4,20.0,20.0,20.0
+poly south 5,20.0,20.0,20.0
+poly south 6,25.0,16.6667,10.0
+poly south 7,10.0,10.0,10.0
+poly south 8,8.3333,8.3333,8.3333
+poly south 9,8.3333,8.3333,8.3333
+poly south 10,33.3333,11.1111,6.25
+poly south 11,8.3333,8.3333,8.3333
+poly south 12,9.0909,9.0909,9.0909
+poly south 13,25.0,16.6667,7.1429
+poly south 14,50.0,20.0,14.2857
+poly south 15,16.6667,16.6667,8.3333
+poly south 16,50.0,12.5,7.1429
+poly south 17,8.3333,8.3333,8.3333
+poly south 18,20.0,20.0,20.0
+poly south 19,9.0909,9.0909,9.0909
+poly south 20,20.0,20.0,20.0
+poly south 21,20.0,12.5,7.6923
+poly south 22,50.0,20.0,14.2857
+poly south 23,50.0,10.0,8.3333
+poly south 24,25.0,12.5,8.3333
+poly south 25,20.0,20.0,20.0
+R2 H2,50.0,2.5,0.4785
+R2 H3,50.0,5.2632,1.1236
+R3 H3,50.0,2.5,0.5291
+R4 H3,50.0,3.8462,0.7407
+R5 H2,33.3333,10.0,2.2727
+Roller 1 analysis,50.0,4.5455,0.9615
+Roller 2 analysis,50.0,12.5,2.439
+Roller 3 analysis,25.0,14.2857,3.0303
+Roller 4 analysis,50.0,14.2857,2.2727
+Roller 5 analysis,25.0,14.2857,9.0909
+Roller 6 analysis,50.0,10.0,2.439
+Roller 7 analysis,50.0,4.7619,1.0
+S1 H2,50.0,12.5,2.2727
+S2 H2,50.0,4.3478,1.2658
+S3 H2,50.0,7.1429,1.7857
+S4 H2,50.0,7.6923,1.5625
+S5 H2,50.0,3.125,0.8696

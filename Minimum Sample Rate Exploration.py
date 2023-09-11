@@ -3,7 +3,7 @@ import pandas as pd
 import algorithm as alg
 import matplotlib.pyplot as plt
 
-name = 'R2 H3'
+name = 'part4'
 name = 'data/' + name + '.csv'
 df = pd.read_csv(name)
 x = np.asarray(df.iloc[:,0])
@@ -12,7 +12,7 @@ y = np.asarray(df.iloc[:,3])
 ############################################################################################################################################
 
 output = alg.findMinimumSampleRate(x,y, 
-                        plot=True, 
+                        plot=False, 
                         verbose=True, 
                         peakRateThreshold=0.04, 
                         samples_per_period=1300, 
@@ -21,10 +21,10 @@ output = alg.findMinimumSampleRate(x,y,
                         get_error=True,
                         resampling_kind='quadratic',)
 
-integral_errors = output[4]
-modulus_errors = output[5]
+integral_errors = output[4][1:]
+modulus_errors = output[5][1:]
 
-intersect_errors = output[6]
+intersect_errors = output[6][1:]
 sample_rates = output[3]
 
 fig, ax = plt.subplots()
