@@ -18,7 +18,7 @@ from matplotlib import cm
 
 
 
-def waveletGen(x,y, bands=(1,31), sampling_period=0.1, wtype='mexh'):
+def wavelet_generator(y, bands=(1,31), sampling_period=0.1, wtype='mexh'):
     """ Performs a continuous wavelet transform on a signal.
     Input:
     x : time or distance axis
@@ -28,177 +28,175 @@ def waveletGen(x,y, bands=(1,31), sampling_period=0.1, wtype='mexh'):
     wtype : wavelet type to use"""
     
     scales = np.arange(bands[0],bands[1])
-    contWav = pywt.cwt(y, scales, wtype, sampling_period=sampling_period)
-    return contWav
+    cont_wavelets = pywt.cwt(y, scales, wtype, sampling_period=sampling_period)
+    return cont_wavelets
 
-def gradientDescent(y, startIdx):
+def gradient_descent(y, start_idx: int):
     """ Finds the index in y of a local minimum starting from index startIdx"""
-    newIdx = startIdx
+    new_idx = start_idx
 
     while True:
-        if newIdx >= len(y)-1:
-            oldIdx = newIdx
-            return newIdx
+        if new_idx >= len(y)-1:
+            return new_idx
         else:
-            right = -y[newIdx] + y[newIdx+1]
+            right = -y[new_idx] + y[new_idx+1]
          
-        if newIdx <= 0:
-            oldIdx = newIdx
-            return newIdx
+        if new_idx <= 0:
+            return new_idx
         else:
-            left = -y[newIdx] + y[newIdx-1]
+            left = -y[new_idx] + y[new_idx-1]
 
         if left > 0 and right > 0:
-            return newIdx
+            return new_idx
         if left < right:
             if left >= 0:
-                return newIdx
+                return new_idx
             else:
-                newIdx = newIdx - 1
+                new_idx = new_idx - 1
         elif left > right:
             if right >= 0:
-                return newIdx
+                return new_idx
             else:
-                newIdx = newIdx + 1
+                new_idx = new_idx + 1
         else:
-            newIdx = newIdx + 1
+            new_idx = new_idx + 1
 
-def minMaxArray(contWav):
-    newArray = np.empty(contWav[0].shape)
-    newArray[:] = np.nan
-    for i in range(contWav[0].shape[0]):
-        maxIndex = np.argmax(contWav[0][i])
-        minIndex = np.argmin(contWav[0][i])
-        newArray[i,maxIndex] = 1
-        newArray[i,minIndex] = -1
-    return newArray
+def min_max_array(cont_wavelets):
+    new_array = np.empty(cont_wavelets[0].shape)
+    new_array[:] = np.nan
+    for i in range(cont_wavelets[0].shape[0]):
+        max_idx = np.argmax(cont_wavelets[0][i])
+        min_idx = np.argmin(cont_wavelets[0][i])
+        new_array[i,max_idx] = 1
+        new_array[i,min_idx] = -1
+    return new_array
 
-def normalizeThrow(x, y, contWav):
+def normalize_throw(y, cont_wavelets):
     """ Normalize throw data to wavelet data for plotting purposes"""
-    newTestNorm = np.asarray(y) * 0.8 * contWav[0].shape[0] / np.max(y)
-    return newTestNorm
+    y_normalized = np.asarray(y) * 0.8 * cont_wavelets[0].shape[0] / np.max(y)
+    return y_normalized
 
-def waveletPlot(x, y, contWav, skip_wavelets=False):
+def wavelet_plot(y, cont_wavelets, skip_wavelets=False):
     """ Plots a wavelet transform of a signal with signal overlayed"""
     if skip_wavelets is False:
-        y_normalized = normalizeThrow(x, y, contWav)
+        y_normalized = normalize_throw(y, cont_wavelets)
     else:
         y_normalized = y
     
     fig, ax = plt.subplots(1, 1)
-    ax.plot(np.arange(contWav[0].shape[1]), y_normalized, color='black')
+    ax.plot(np.arange(cont_wavelets[0].shape[1]), y_normalized, color='black')
     if skip_wavelets is False:
-        im = ax.imshow(contWav[0], interpolation='nearest', aspect='auto', origin='lower')
+        im = ax.imshow(cont_wavelets[0], interpolation='nearest', aspect='auto', origin='lower')
         plt.colorbar(im)
-        plt.yticks(np.arange(contWav[0].shape[0])[::-1],np.round(contWav[1],3))
+        plt.yticks(np.arange(cont_wavelets[0].shape[0])[::-1],np.round(cont_wavelets[1],3))
         plt.xlabel('Inline No.')
         plt.ylabel('Wavelet Wavelength')
     return fig, ax
 
-def segmentPlot(segmentLocations, y, contWav):
+def segment_plot(segment_locations, y, cont_wavelets):
     """ Plots segment predictions from three input points for each segment"""
-    newTestNorm = np.asarray([y[segmentLocations[0]], y[segmentLocations[1]], y[segmentLocations[2]]]) * (0.8 * contWav[0].shape[0]/np.max(y))
-    plt.plot([segmentLocations[0],segmentLocations[1],segmentLocations[2]], newTestNorm, color='red')
-    plt.stem([segmentLocations[0],segmentLocations[1],segmentLocations[2]], newTestNorm, linefmt='red',markerfmt=' ')
+    y_normalized = np.asarray([y[segment_locations[0]], y[segment_locations[1]], y[segment_locations[2]]]) * (0.8 * cont_wavelets[0].shape[0]/np.max(y))
+    plt.plot([segment_locations[0],segment_locations[1],segment_locations[2]], y_normalized, color='red')
+    plt.stem([segment_locations[0],segment_locations[1],segment_locations[2]], y_normalized, linefmt='red',markerfmt=' ')
 
-def waveletPlot3D(contWav):
+def wavelet_plot_3D(cont_wavelets):
     """ 3D surface plot of a continuous wavelet transform"""
-    wavX = np.reshape(np.asarray([i for (i,j), value in np.ndenumerate(contWav[0])]), (contWav[0].shape[0],contWav[0].shape[1]))
-    wavY = np.reshape(np.asarray([j for (i,j), value in np.ndenumerate(contWav[0])]), (contWav[0].shape[0],contWav[0].shape[1]))
-    wavZ = contWav[0]
+    x = np.reshape(np.asarray([i for (i,j), value in np.ndenumerate(cont_wavelets[0])]), (cont_wavelets[0].shape[0],cont_wavelets[0].shape[1]))
+    y = np.reshape(np.asarray([j for (i,j), value in np.ndenumerate(cont_wavelets[0])]), (cont_wavelets[0].shape[0],cont_wavelets[0].shape[1]))
+    z = cont_wavelets[0]
 
 
     fig, ax = plt.subplots(subplot_kw={'projection': '3d'})
-    ax.plot_surface(wavX, wavY, wavZ, cmap=cm.copper)
+    ax.plot_surface(x, y, z, cmap=cm.copper)
     return fig, ax
 
-def firstSegment(x, y, contWav, fullx, fully, fullContWav, offset, peakRateThreshold=0.03, show_warnings=False):
+def first_segment(x, y, cont_wavelets, y_full, fullcont_wavelets, offset, peak_rate_threshold=0.03, show_warnings=False):
     """ Detect a fault segment within a range of a signal."""
     # find dips and peaks for each wavelet wavelength
-    dips = [list(find_peaks(wavelength*-1)[0]) for wavelength in fullContWav[0]]
-    peaks = [list(find_peaks(wavelength)[0]) for wavelength in fullContWav[0]]
-    offsetEnd = offset+len(y)
+    dips = [list(find_peaks(wavelength*-1)[0]) for wavelength in fullcont_wavelets[0]]
+    peaks = [list(find_peaks(wavelength)[0]) for wavelength in fullcont_wavelets[0]]
+    offset_end = offset+len(y)
     # remove dips and peaks that are outside of the scan range
-    allowedDips = [[j for j in i if offsetEnd > j > offset] for i in dips]
-    allowedPeaks = [[j for j in i if offsetEnd > j > offset] for i in peaks]
+    allowed_dips = [[j for j in i if offset_end > j > offset] for i in dips]
+    allowed_peaks = [[j for j in i if offset_end > j > offset] for i in peaks]
 
-    for i in range(len(allowedDips)):
+    for i in range(len(allowed_dips)):
         # add start and end of scan range to dips when needed
-        if contWav[0][i][0] < contWav[0][i][1]:
-            allowedDips[i] = [offset] + allowedDips[i]
-        if contWav[0][i][-1] < contWav[0][i][-2]:
-            allowedDips[i] = allowedDips[i] + [offsetEnd]
+        if cont_wavelets[0][i][0] < cont_wavelets[0][i][1]:
+            allowed_dips[i] = [offset] + allowed_dips[i]
+        if cont_wavelets[0][i][-1] < cont_wavelets[0][i][-2]:
+            allowed_dips[i] = allowed_dips[i] + [offset_end]
 
     # getting peak height and filtering unusable wavelengths
-    fullPeakRate = [len(i)/len(fully) for i in peaks]
-    allowedWavelengths = [i for i in range(len(fullPeakRate)) if fullPeakRate[i] < peakRateThreshold and len(allowedPeaks[i]) > 0]
-    fullSegmentWavelengths = [i for i in allowedWavelengths if len(allowedDips[i]) > 1 and len(allowedPeaks[i]) > 0]
-    if fullSegmentWavelengths == []:
+    full_peak_rate = [len(i)/len(y_full) for i in peaks]
+    allowed_wavelengths = [i for i in range(len(full_peak_rate)) if full_peak_rate[i] < peak_rate_threshold and len(allowed_peaks[i]) > 0]
+    full_segment_wavelengths = [i for i in allowed_wavelengths if len(allowed_dips[i]) > 1 and len(allowed_peaks[i]) > 0]
+    if full_segment_wavelengths == []:
         return None, None, None
-    peakHeight = [(idx, value[np.argmax([fully[j] for j in value])], np.max([fully[j] for j in value])) for idx, value in enumerate(allowedPeaks) if len(value) > 0]
+    peak_height = [(idx, value[np.argmax([y_full[j] for j in value])], np.max([y_full[j] for j in value])) for idx, value in enumerate(allowed_peaks) if len(value) > 0]
 
-    firstSegFrequencyIndex = fullSegmentWavelengths[0]
-    for i in peakHeight:
-        # segPeak is found by getting peak on the wavelength chosen
-        if i[0] == firstSegFrequencyIndex:
-            segPeak = i[1] - offset
+    segment_frequency_idx = full_segment_wavelengths[0]
+    for i in peak_height:
+        # segment_peak is found by getting peak on the wavelength chosen
+        if i[0] == segment_frequency_idx:
+            segment_peak = i[1] - offset
 
-    firstSegFrequencyAmplitude = fullContWav[0][firstSegFrequencyIndex,offset:offsetEnd]
-    localMinima = np.insert(np.asarray([0,len(x)-1]),1,find_peaks(np.asarray(savgol_filter(firstSegFrequencyAmplitude, 5, 3, mode='nearest')) *-1,width=8)[0])
+    segment_frequency_amplitude = fullcont_wavelets[0][segment_frequency_idx,offset:offset_end]
+    local_minima = np.insert(np.asarray([0,len(x)-1]),1,find_peaks(np.asarray(savgol_filter(segment_frequency_amplitude, 5, 3, mode='nearest')) *-1,width=8)[0])
 
-    firstMinimum = localMinima[(np.abs(localMinima-segPeak)).argmin()]
-    if firstMinimum < segPeak:
-        localMinima = [localMinima[i] for i in range(len(localMinima)) if localMinima[i] > segPeak]
-        if len(localMinima) == 0:
-            secondMinimum = len(x)-1
-    elif firstMinimum > segPeak:
-        localMinima = [localMinima[i] for i in range(len(localMinima)) if localMinima[i] < segPeak]
-        if len(localMinima) == 0:
-            secondMinimum = 0
+    first_minimum = local_minima[(np.abs(local_minima-segment_peak)).argmin()]
+    if first_minimum < segment_peak:
+        local_minima = [local_minima[i] for i in range(len(local_minima)) if local_minima[i] > segment_peak]
+        if len(local_minima) == 0:
+            second_minimum = len(x)-1
+    elif first_minimum > segment_peak:
+        local_minima = [local_minima[i] for i in range(len(local_minima)) if local_minima[i] < segment_peak]
+        if len(local_minima) == 0:
+            second_minimum = 0
     else:
         if show_warnings is True:
             print('Warning: Zero sized segment')
         return None, None, None
-    if len(localMinima) == 0:
+    if len(local_minima) == 0:
         pass
     else:
-        secondMinimum = localMinima[(np.abs(localMinima-segPeak)).argmin()]
+        second_minimum = local_minima[(np.abs(local_minima-segment_peak)).argmin()]
 
 
-    firstMinimum = gradientDescent(savgol_filter(y, 11, 3, mode='nearest'), firstMinimum)
-    secondMinimum = gradientDescent(savgol_filter(y, 11, 3, mode='nearest'), secondMinimum)
+    first_minimum = gradient_descent(savgol_filter(y, 11, 3, mode='nearest'), first_minimum)
+    second_minimum = gradient_descent(savgol_filter(y, 11, 3, mode='nearest'), second_minimum)
 
-    lower = np.min([firstMinimum,segPeak,secondMinimum])
-    upper = np.max([firstMinimum,segPeak,secondMinimum])
-    segPeak = np.argmax(y[lower:upper]) + lower
-    if segPeak != lower and segPeak != upper:
-        lower = lower + np.argmin(y[lower:segPeak])
-        upper = segPeak + np.argmin(y[segPeak:upper]) 
+    lower = np.min([first_minimum,segment_peak,second_minimum])
+    upper = np.max([first_minimum,segment_peak,second_minimum])
+    segment_peak = np.argmax(y[lower:upper]) + lower
+    if segment_peak != lower and segment_peak != upper:
+        lower = lower + np.argmin(y[lower:segment_peak])
+        upper = segment_peak + np.argmin(y[segment_peak:upper]) 
     else:
         if show_warnings is True:
             print('Warning: Bad Segment Shape')
         return None, None, None
-    firstMinimum = lower
-    secondMinimum = upper
-    return firstMinimum, segPeak, secondMinimum
+    first_minimum = lower
+    second_minimum = upper
+    return first_minimum, segment_peak, second_minimum
 
-def resampleToPeak(x, y, wtype='mexh', bands=(1,31), sampling_period=0.1, samples_per_period=100, sample_rate_override=None, kind='linear'):
+def resample_to_peak(x, y, wtype='mexh', bands=(1,31), sampling_period=0.1, samples_per_period=100, sample_rate_override=None, kind='linear'):
     """ Apply interpolation to match a signal to the peak wavelength of a wavelet transform.
     When sample_rate_override is used, the signal is resampled to the specified number of samples."""
-    peakWavelength = pywt.scale2frequency(wtype, bands[0])/sampling_period
+    peak_wavelength = pywt.scale2frequency(wtype, bands[0])/sampling_period
     if sample_rate_override != None:
-        totalSamples = int(sample_rate_override)
+        total_samples = int(sample_rate_override)
     else:
-        totalSamples = int(peakWavelength*samples_per_period)
+        total_samples = int(peak_wavelength*samples_per_period)
     f = interp1d(x, y, kind=kind)
-    return np.linspace(np.min(x), np.max(x), totalSamples), f(np.linspace(np.min(x), np.max(x), totalSamples))
+    return np.linspace(np.min(x), np.max(x), total_samples), f(np.linspace(np.min(x), np.max(x), total_samples))
 
-def fullSegmentAnalysis(x, y, 
+def full_segment_analysis(x, y, 
                         bands=(1,31), sampling_period=0.1, wtype='mexh', 
                         name='Unknown', 
-                        peakRateThreshold=0.03, 
+                        peak_rate_threshold=0.03, 
                         join=False, 
-                        segmentMode='flat', 
+                        segment_mode='flat', 
                         degree=3, 
                         plot=False, 
                         title='long', 
@@ -209,7 +207,8 @@ def fullSegmentAnalysis(x, y,
     """ The main function. Takes in fault shape data in a form with fault throw on the y axis, and distance along fault on the x axis.
         Returns a list of estimated segments, with their start, peak and end points. 
         Poly mode also returns a list of polynomial regression models for each segment."""
-    x, y = resampleToPeak(x, y, wtype=wtype, bands=bands, sampling_period=sampling_period, samples_per_period=samples_per_period, kind=resampling_kind)
+    
+    x, y = resample_to_peak(x, y, wtype=wtype, bands=bands, sampling_period=sampling_period, samples_per_period=samples_per_period, kind=resampling_kind)
     
     allSegments = []
     ignoredRanges = []
@@ -254,9 +253,9 @@ def fullSegmentAnalysis(x, y,
         for range in significantRangesToScan:
             rangeX = x[range[0]:range[1]]
             rangeY = y[range[0]:range[1]]
-            contWav = waveletGen(x[range[0]:range[1]], y[range[0]:range[1]], bands=bands, sampling_period=sampling_period, wtype=wtype)
-            fullContWav = waveletGen(x, y, bands=bands, sampling_period=sampling_period, wtype=wtype)
-            newSegmentRange = firstSegment(x[range[0]:range[1]], y[range[0]:range[1]], contWav, x, y, fullContWav, range[0], peakRateThreshold=peakRateThreshold, show_warnings=show_warnings)
+            cont_wavelets = wavelet_generator(y[range[0]:range[1]], bands=bands, sampling_period=sampling_period, wtype=wtype)
+            fullcont_wavelets = wavelet_generator(y, bands=bands, sampling_period=sampling_period, wtype=wtype)
+            newSegmentRange = first_segment(x[range[0]:range[1]], y[range[0]:range[1]], cont_wavelets, y, fullcont_wavelets, range[0], peak_rate_threshold=peak_rate_threshold, show_warnings=show_warnings)
             if None in newSegmentRange:
                 ignoredRanges.append(range)
             else:
@@ -290,28 +289,28 @@ def fullSegmentAnalysis(x, y,
             allSegments = newSegments
 
     if plot == True:
-        waveletPlot(x, y, waveletGen(x,y), skip_wavelets=skip_wavelets)
-        if segmentMode == 'flat':
+        wavelet_plot(y, wavelet_generator(y), skip_wavelets=skip_wavelets)
+        if segment_mode == 'flat':
             for seg in allSegments:
-                segmentPlot(seg, y, waveletGen(x,y))
-        elif segmentMode == 'poly':
-            regressionPlot(allSegments, allSegmentsPolynomialRegression(y, allSegments, degree=degree), y, waveletGen(x,y), skip_wavelets=skip_wavelets)
-        elif segmentMode == 'all':
+                segment_plot(seg, y, wavelet_generator(y))
+        elif segment_mode == 'poly':
+            regression_plot(allSegments, all_segments_polynomial_regression(y, allSegments, degree=degree), y, wavelet_generator(y), skip_wavelets=skip_wavelets)
+        elif segment_mode == 'all':
             for seg in allSegments:
-                segmentPlot(seg, y, waveletGen(x,y))
-            regressionPlot(allSegments, allSegmentsPolynomialRegression(y, allSegments, degree=degree), y, waveletGen(x,y))
+                segment_plot(seg, y, wavelet_generator(y))
+            regression_plot(allSegments, all_segments_polynomial_regression(y, allSegments, degree=degree), y, wavelet_generator(y))
         else:
-            print('Warning: segmentMode not recognised, no segments plotted')
+            print('Warning: segment_mode not recognised, no segments plotted')
         if title=='long':
-            plt.title('Full Segment Analysis of '+ name + ' fault \nConstants: wtype=' + str(wtype) + ' sampling_period=' + str(sampling_period) + ' bands=' + str(bands[1]-bands[0]) + ' peakRateThreshold=' + str(peakRateThreshold))
+            plt.title('Full Segment Analysis of '+ name + ' fault \nConstants: wtype=' + str(wtype) + ' sampling_period=' + str(sampling_period) + ' bands=' + str(bands[1]-bands[0]) + ' peak_rate_threshold=' + str(peak_rate_threshold))
         elif title=='short':
             plt.title('Full Segment Analysis of '+ name + ' fault')
-    if segmentMode == 'poly' or segmentMode == 'all':
-        return allSegments, allSegmentsPolynomialRegression(y, allSegments, degree=degree)
+    if segment_mode == 'poly' or segment_mode == 'all':
+        return allSegments, all_segments_polynomial_regression(y, allSegments, degree=degree)
     else:
         return allSegments
 
-def segmentPolynomialRegression(y, start, peak, end, degree=3):
+def segment_polynomial_regression(y, start, peak, end, degree=3):
     """ Obtain a cubic function that fits a segment of a signal"""
     segmentYThrow = y[start:end+1]
 
@@ -337,52 +336,52 @@ def segmentPolynomialRegression(y, start, peak, end, degree=3):
     poly_reg_model = LinearRegression()
     return poly_reg_model.fit(poly_features, segmentYThrowWeighted), segmentXThrowWeighted, poly_features
 
-def allSegmentsPolynomialRegression(y, allSegments, degree=3):
+def all_segments_polynomial_regression(y, allSegments, degree=3):
     """ Repeat polynomial regression for all input segments"""
-    return [segmentPolynomialRegression(y, segment[0], segment[1], segment[2], degree=degree) for segment in allSegments]
+    return [segment_polynomial_regression(y, segment[0], segment[1], segment[2], degree=degree) for segment in allSegments]
 
-def regressionPlot(allSegments, segmentRegression, y, contWav, skip_wavelets=False):
+def regression_plot(allSegments, segmentRegression, y, cont_wavelets, skip_wavelets=False):
     """ Plot results of regression"""
     for index, segment in enumerate(allSegments):
         y_predicted = segmentRegression[index][0].predict(segmentRegression[index][2])
         if skip_wavelets is False:
-            plt.plot(segmentRegression[index][1] + segment[0], y_predicted * 0.8 * contWav[0].shape[0] / np.max(y), color='red')
+            plt.plot(segmentRegression[index][1] + segment[0], y_predicted * 0.8 * cont_wavelets[0].shape[0] / np.max(y), color='red')
         else:
             plt.plot(segmentRegression[index][1] + segment[0], y_predicted, color='red')
     return None
 
-def reduceDataResample(x, factor):
+def reduce_data_resample(x, factor):
     """ Resample a signal to a lower sample rate"""
     return resample(x, int(len(x)/factor))
 
-def reduceDataDecimate(x, factor):
+def reduce_data_decimate(x, factor):
     """ Decimate a signal to a lower sample rate"""
     return x[0::int(factor)]
 
-def closestArg(array, val):
+def closest_idx(array, val):
     return np.abs(np.asarray(array)-val).argmin()
 
-def findMinimumSampleRate(x, y, 
+def find_minimum_sample_rate(x, y, 
                           samplingMode='interpolate', 
                           bands=(1,31), 
                           samples_per_period=100,
                           sampling_period=0.1, 
                           wtype='mexh', 
                           name='Unknown', 
-                          peakRateThreshold=0.03,
+                          peak_rate_threshold=0.03,
                           plot=False, 
                           verbose=False, 
                           resampling_kind='linear',
                           get_error=False):
-    allSegmentsFull, segmentRegressionFull = fullSegmentAnalysis(x,y, 
+    allSegmentsFull, segmentRegressionFull = full_segment_analysis(x,y, 
                                           bands=bands, 
                                           samples_per_period=samples_per_period,
                                           sampling_period=sampling_period, 
                                           wtype=wtype,
                                           name=name, 
-                                          peakRateThreshold=peakRateThreshold, 
+                                          peak_rate_threshold=peak_rate_threshold, 
                                           join=True, 
-                                          segmentMode='poly')
+                                          segment_mode='poly')
     xNew = x.copy()
     yNew = y.copy()
 
@@ -391,8 +390,8 @@ def findMinimumSampleRate(x, y,
     if get_error is True:
         integral_error = []
         modulus_error = []
-        modulus_error.append(modulusError(x, y, xNew, yNew))
-        integral_error.append(allSegmentsIntegral(allSegmentsFull, allSegmentsFull, segmentRegressionFull, segmentRegressionFull))
+        modulus_error.append(modulus_error(x, y, xNew, yNew))
+        integral_error.append(all_segments_integral(allSegmentsFull, allSegmentsFull, segmentRegressionFull, segmentRegressionFull))
     sample_rates = []
     # sample_rates.append(int(len(x) * 0.9**(sampleFactor-1)))
     while True:
@@ -402,45 +401,45 @@ def findMinimumSampleRate(x, y,
         sampleFactor = sampleFactor+1
 
         if get_error is True:
-            x_temp, y_temp = resampleToPeak(x, y, 
+            x_temp, y_temp = resample_to_peak(x, y, 
                                         wtype=wtype, 
                                         bands=bands, 
                                         samples_per_period=samples_per_period,
                                         sampling_period=sampling_period, 
                                         sample_rate_override=int(len(x) * 0.9**(sampleFactor-2)), 
                                         kind=resampling_kind)
-            modulus_error.append(modulusError(x, y, x_temp, y_temp))
+            modulus_error.append(modulus_error(x, y, x_temp, y_temp))
         sample_rates.append(int(len(x) * 0.9**(sampleFactor-2)))
 
         # print('Number of Samples: ', len(xNew))
-        allSegments, segmentsRegression = fullSegmentAnalysis(xNew,yNew, 
+        allSegments, segmentsRegression = full_segment_analysis(xNew,yNew, 
                                           bands=bands, 
                                           samples_per_period=samples_per_period,
                                           sampling_period=sampling_period, 
                                           wtype=wtype,
                                           name=name, 
-                                          peakRateThreshold=peakRateThreshold, 
+                                          peak_rate_threshold=peak_rate_threshold, 
                                           join=True, 
-                                          segmentMode='poly', 
+                                          segment_mode='poly', 
                                           plot=False, 
                                           resampling_kind=resampling_kind)
         # integral error
         if get_error is True:
-            integral_error.append(allSegmentsIntegral(allSegmentsFull, allSegments, segmentRegressionFull, segmentsRegression))
+            integral_error.append(all_segments_integral(allSegmentsFull, allSegments, segmentRegressionFull, segmentsRegression))
 
         if verbose is True:
             print('Number of Segments: ', len(allSegments))
         if len(allSegments) < len(allSegmentsFull) or len(xNew) < 4:
             # reproduce previous sample rate
             if samplingMode == 'decimate':
-                xPrevious = reduceDataDecimate(x, sampleFactor-2)
-                yPrevious = reduceDataDecimate(y, sampleFactor-2)
+                xPrevious = reduce_data_decimate(x, sampleFactor-2)
+                yPrevious = reduce_data_decimate(y, sampleFactor-2)
             elif samplingMode == 'resample':
-                xPrevious = reduceDataResample(x, sampleFactor-2)
-                yPrevious = reduceDataResample(y, sampleFactor-2)
+                xPrevious = reduce_data_resample(x, sampleFactor-2)
+                yPrevious = reduce_data_resample(y, sampleFactor-2)
             elif samplingMode == 'interpolate':
                 #interpolate mode
-                xPrevious, yPrevious = resampleToPeak(x, y, 
+                xPrevious, yPrevious = resample_to_peak(x, y, 
                                                       wtype=wtype, 
                                                       bands=bands, 
                                                       samples_per_period=samples_per_period,
@@ -453,20 +452,20 @@ def findMinimumSampleRate(x, y,
             if verbose is True:
                 print('Starting Samples: ', len(x),'Minimum Samples: ', len(xPrevious))
             # Find smallest segment length
-            oldSegments = fullSegmentAnalysis(xPrevious,yPrevious, 
+            oldSegments = full_segment_analysis(xPrevious,yPrevious, 
                                               bands=bands, 
                                               samples_per_period=samples_per_period,
                                               sampling_period=sampling_period, 
                                               wtype=wtype,
                                               name=name, 
-                                              peakRateThreshold=peakRateThreshold, 
+                                              peak_rate_threshold=peak_rate_threshold, 
                                               join=True, 
-                                              segmentMode='poly', 
+                                              segment_mode='poly', 
                                               plot=plot, 
                                               resampling_kind=resampling_kind,
                                               skip_wavelets=True)[0]
             xPreviousRescaled = np.linspace(0,250,len(xPrevious))
-            allSizes = [closestArg(xPreviousRescaled, i[2])-closestArg(xPreviousRescaled, i[0])+2 for i in oldSegments]
+            allSizes = [closest_idx(xPreviousRescaled, i[2])-closest_idx(xPreviousRescaled, i[0])+2 for i in oldSegments]
             percentage = 100/np.max(allSizes)
             percentageSmall = 100/np.min(allSizes)
             percentageTotal = 100/np.sum(allSizes)
@@ -482,15 +481,15 @@ def findMinimumSampleRate(x, y,
                 plt.title("Minimum Sample Rate")
                 plt.show()
 
-                allSegments = fullSegmentAnalysis(xNew,yNew, 
+                allSegments = full_segment_analysis(xNew,yNew, 
                                                   bands=bands, 
                                                   samples_per_period=samples_per_period,
                                                   sampling_period=sampling_period, 
                                                   wtype=wtype,
                                                   name=name, 
-                                                  peakRateThreshold=peakRateThreshold, 
+                                                  peak_rate_threshold=peak_rate_threshold, 
                                                   join=True, 
-                                                  segmentMode='poly', 
+                                                  segment_mode='poly', 
                                                   plot=True, 
                                                   resampling_kind=resampling_kind,
                                                   skip_wavelets=True)
@@ -500,14 +499,14 @@ def findMinimumSampleRate(x, y,
             break
         # go to next sample rate
         if samplingMode == 'decimate':
-            xNew = reduceDataDecimate(x, sampleFactor)
-            yNew = reduceDataDecimate(y, sampleFactor)
+            xNew = reduce_data_decimate(x, sampleFactor)
+            yNew = reduce_data_decimate(y, sampleFactor)
         elif samplingMode == 'resample':
-            xNew = reduceDataResample(x, sampleFactor)
-            yNew = reduceDataResample(y, sampleFactor)
+            xNew = reduce_data_resample(x, sampleFactor)
+            yNew = reduce_data_resample(y, sampleFactor)
         elif samplingMode == 'interpolate':
             #interpolate mode
-            xNew, yNew = resampleToPeak(x, y, 
+            xNew, yNew = resample_to_peak(x, y, 
                                         wtype=wtype, 
                                         bands=bands, 
                                         samples_per_period=samples_per_period,
@@ -526,7 +525,7 @@ def findMinimumSampleRate(x, y,
     else:
         return (percentage, percentageSmall, percentageTotal, sample_rates)
 
-def integralDifference(poly1, poly2, bounds1, bounds2):
+def integral_difference(poly1, poly2, bounds1, bounds2):
     """ Returns the percentage difference between the integrals of two polynomials
     Output:
     [0] : Percentage difference between the integrals of the two polynomials
@@ -551,24 +550,24 @@ def integralDifference(poly1, poly2, bounds1, bounds2):
 
 
     
-    areaDifference = quad(lambda x: cubicAbsDiff(x, coeffs_1[0], coeffs_1[1], coeffs_1[2], coeffs_1[3], coeffs_2[0], coeffs_2[1], coeffs_2[2], coeffs_2[3], offset1=offset1, offset2=offset2), 0, bounds[1]-bounds[0])
-    difference_1 = quad(lambda x: cubicAbs(x, coeffs_1[0], coeffs_1[1], coeffs_1[2], coeffs_1[3], offset=offset1), 0, bounds[1]-bounds[0])
-    difference_2 = quad(lambda x: cubicAbs(x, coeffs_2[0], coeffs_2[1], coeffs_2[2], coeffs_2[3], offset=offset2), 0, bounds[1]-bounds[0])
+    areaDifference = quad(lambda x: cubic_abs_difference(x, coeffs_1[0], coeffs_1[1], coeffs_1[2], coeffs_1[3], coeffs_2[0], coeffs_2[1], coeffs_2[2], coeffs_2[3], offset1=offset1, offset2=offset2), 0, bounds[1]-bounds[0])
+    difference_1 = quad(lambda x: cubic_abs(x, coeffs_1[0], coeffs_1[1], coeffs_1[2], coeffs_1[3], offset=offset1), 0, bounds[1]-bounds[0])
+    difference_2 = quad(lambda x: cubic_abs(x, coeffs_2[0], coeffs_2[1], coeffs_2[2], coeffs_2[3], offset=offset2), 0, bounds[1]-bounds[0])
     
     areaDifferenceRatio = areaDifference[0]/np.max([difference_1[0], difference_2[0]])
 
     return (areaDifferenceRatio, areaDifference[0], difference_1[0], difference_2[0])
 
-def cubicAbs(x,cube,square,linear,constant,offset=0):
+def cubic_abs(x,cube,square,linear,constant,offset=0):
     """ Returns the absolute value of a cubic polynomial"""
     return np.abs(cube*(x+offset)**3 + square*(x+offset)**2 + linear*(x+offset) + constant)
 
-def cubicAbsDiff(x,cube1,square1,linear1,constant1,cube2,square2,linear2,constant2,offset1=0,offset2=0):
+def cubic_abs_difference(x,cube1,square1,linear1,constant1,cube2,square2,linear2,constant2,offset1=0,offset2=0):
     """ Returns the absolute value of the difference between two cubic polynomials with offset values"""
     return np.abs(cube1*(x+offset1)**3 + square1*(x+offset1)**2 + linear1*(x+offset1) + constant1 - (cube2*(x+offset2)**3 + square2*(x+offset2)**2 + linear2*(x+offset2) + constant2))
 
-def allSegmentsIntegral(allSegments, allSegments2, segmentRegression, segmentRegression2, include_unmatched=True):
-    allSegmentsMatch, allSegments2Match, segmentRegressionMatch, segmentRegression2Match, intersectError = faultMatchup(allSegments, allSegments2, segmentRegression, segmentRegression2)
+def all_segments_integral(allSegments, allSegments2, segmentRegression, segmentRegression2, include_unmatched=True):
+    allSegmentsMatch, allSegments2Match, segmentRegressionMatch, segmentRegression2Match, intersectError = fault_matchup(allSegments, allSegments2, segmentRegression, segmentRegression2)
 
     # Error for unmatched faults
     if include_unmatched is True:
@@ -577,16 +576,16 @@ def allSegmentsIntegral(allSegments, allSegments2, segmentRegression, segmentReg
             for idx, curve in enumerate(segmentRegression):
                 if curve not in segmentRegressionMatch:
                     coeffs_1 = np.asarray(list(curve[0].coef_)[::-1] + [curve[0].intercept_])
-                    unMatched.append(quad(lambda x: cubicAbs(x, coeffs_1[0], coeffs_1[1], coeffs_1[2], coeffs_1[3], offset=allSegments[idx][0]), 0, allSegments[idx][2]-allSegments[idx][0])[0])
+                    unMatched.append(quad(lambda x: cubic_abs(x, coeffs_1[0], coeffs_1[1], coeffs_1[2], coeffs_1[3], offset=allSegments[idx][0]), 0, allSegments[idx][2]-allSegments[idx][0])[0])
         if len(segmentRegression2Match) != len(segmentRegression2):
             for idx, curve in enumerate(segmentRegression2):
                 if curve not in segmentRegression2Match:
                     coeffs_1 = np.asarray(list(curve[0].coef_)[::-1] + [curve[0].intercept_])
-                    unMatched.append(quad(lambda x: cubicAbs(x, coeffs_1[0], coeffs_1[1], coeffs_1[2], coeffs_1[3], offset=allSegments2[idx][0]), 0, allSegments2[idx][2]-allSegments2[idx][0])[0])
+                    unMatched.append(quad(lambda x: cubic_abs(x, coeffs_1[0], coeffs_1[1], coeffs_1[2], coeffs_1[3], offset=allSegments2[idx][0]), 0, allSegments2[idx][2]-allSegments2[idx][0])[0])
 
 
     # integral differences
-    all_differences = [integralDifference(segmentRegressionMatch[i][0], segmentRegression2Match[i][0], (allSegmentsMatch[i][0], allSegmentsMatch[i][2]), (allSegments2Match[i][0], allSegments2Match[i][2])) for i in range(len(allSegmentsMatch))]
+    all_differences = [integral_difference(segmentRegressionMatch[i][0], segmentRegression2Match[i][0], (allSegmentsMatch[i][0], allSegmentsMatch[i][2]), (allSegments2Match[i][0], allSegments2Match[i][2])) for i in range(len(allSegmentsMatch))]
 
     # split up list
     all_errors = [i[1] for i in all_differences] + unMatched
@@ -595,7 +594,7 @@ def allSegmentsIntegral(allSegments, allSegments2, segmentRegression, segmentReg
 
     return (all_differences, np.sum(all_errors)/np.sum(all_areas), intersectError) 
 
-def cubicPlot(allSegments, polynomialRegression, numPoints=100, color='red', label='Segments'):
+def cubic_plot(allSegments, polynomialRegression, numPoints=100, color='red', label='Segments'):
     for i in range(len(allSegments)):
         xPlot = np.linspace(0, allSegments[i][2]-allSegments[i][0], numPoints)
         f = lambda x: polynomialRegression[i][0].coef_[2]*x**3 + polynomialRegression[i][0].coef_[1]*x**2 + polynomialRegression[i][0].coef_[0]*x + polynomialRegression[i][0].intercept_
@@ -607,7 +606,7 @@ def cubicPlot(allSegments, polynomialRegression, numPoints=100, color='red', lab
             plt.plot(xPlot, yPlot, color=color)
     return None
 
-def modulusError(x, y, x2, y2):
+def modulus_error(x, y, x2, y2):
     x = np.asarray(x)
     y = np.asarray(y)
     x2 = np.asarray(x2)
@@ -627,7 +626,7 @@ def modulusError(x, y, x2, y2):
     modulus_error = np.trapz(y_diff, x_diff)
     return (modulus_error, modulus_error/np.trapz(y, x))
 
-def faultMatchup(allSegments, allSegments2, segmentRegression, segmentRegression2):
+def fault_matchup(allSegments, allSegments2, segmentRegression, segmentRegression2):
     if len(allSegments) == len(allSegments2):
         intersectError = np.mean([np.abs(allSegments[i][0] - allSegments2[i][0])/np.max([allSegments[i][2]-allSegments[i][0],allSegments2[i][2]-allSegments[i][0]]) for i in range(len(allSegments))])
     else:
@@ -647,7 +646,7 @@ def faultMatchup(allSegments, allSegments2, segmentRegression, segmentRegression
         if len(allSegments) > len(allSegments2):
             startPointsTemp = startPoints.copy()
             for idx, point in enumerate(startPoints2):
-                newPoint = closestArg(startPoints, point)
+                newPoint = closest_idx(startPoints, point)
                 newSegments[idx] = allSegments[newPoint]
                 newSegments2[idx] = allSegments2[idx]
                 newSegmentRegression[idx] = segmentRegression[newPoint]
@@ -663,7 +662,7 @@ def faultMatchup(allSegments, allSegments2, segmentRegression, segmentRegression
         if len(allSegments) < len(allSegments2):
             startPoints2Temp = startPoints2.copy()
             for idx, point in enumerate(startPoints):
-                newPoint = closestArg(startPoints2, point)
+                newPoint = closest_idx(startPoints2, point)
                 newSegments2[idx] = allSegments2[newPoint]
                 newSegments[idx] = allSegments[idx]
                 newSegmentRegression2[idx] = segmentRegression2[newPoint]
