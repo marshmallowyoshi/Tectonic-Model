@@ -11,10 +11,10 @@ y = np.asarray(df.iloc[:,3])
 
 ############################################################################################################################################
 
-output = alg.findMinimumSampleRate(x,y, 
+output = alg.find_minimum_sample_rate(x,y, 
                         plot=False, 
                         verbose=True, 
-                        peakRateThreshold=0.04, 
+                        peak_rate_threshold=0.04, 
                         samples_per_period=1300, 
                         sampling_period=1, 
                         bands=(1,31),
