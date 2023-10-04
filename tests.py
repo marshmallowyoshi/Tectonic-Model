@@ -8,23 +8,22 @@ import scipy.optimize as opt
 from scipy import stats
 import algorithm as alg
 
-name = 'L2 H4-1'
+name = 'R2 H3'
 name = 'data/' + name + '.csv'
 df = pd.read_csv(name)
 x = np.asarray(df.iloc[:,0])
 y = np.asarray(df.iloc[:,3])
 x, y = alg.resample_to_peak(x, y, sample_rate_override=0.9*len(x), kind='quadratic')
-peak_rate_threshold = 0.04
+# peak_rate_threshold = 0.03
 contWav = alg.wavelet_generator(x,y)
-allSegments = alg.full_segment_analysis(x,y, 
-                                      name=name, 
-                                      peak_rate_threshold=peak_rate_threshold, 
-                                      join=True, 
-                                      segment_mode='poly', 
-                                      plot=True, 
-                                      title='short', 
-                                      samples_per_period=1300, 
-                                      bands=(1,31), 
+allSegments = alg.full_segment_analysis(x,y,
+                                      name=name,
+                                      join=True,
+                                      segment_mode='poly',
+                                      plot=True,
+                                      title='short',
+                                      samples_per_period=1300,
+                                      bands=(1,31),
                                       sampling_period=1,
                                       skip_wavelets=False)
 # plt.axis('off')

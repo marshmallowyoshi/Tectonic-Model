@@ -1,11 +1,8 @@
+import ast
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
-import ast
 import scipy.stats as stats
-
-
-import algorithm as alg
 
 df = pd.read_csv('results with error progression kind=quadratic peakratethreshold=0.04 samplesperperiod=1300 samplingperiod=1.csv', 
                  converters={'Integral Error':ast.literal_eval,'Modulus Error':ast.literal_eval, 'Intersect Error':ast.literal_eval})
@@ -140,10 +137,10 @@ plt.show()
 
 # plt.scatter(final_integral_error, final_intersect_error, color='black', marker='x', s=2)
 # plt.axline((0,0), slope=1, color='red')
-# # plt.axvline(np.median(final_integral_error), color='blue', label=str('Integral Error Median: ' + str(np.round(np.median(final_integral_error), 3)) + '%'))
-# # plt.axhline(np.median(final_intersect_error), color='blue', label=str('Intersect Error Median: ' + str(np.round(np.median(final_intersect_error), 3)) + '%'))
-# # plt.axvline(np.mean(final_integral_error), color='green', label=str('Integral Error Mean: ' + str(np.round(np.mean(final_integral_error), 3)) + '%'))
-# # plt.axhline(np.mean(final_intersect_error), color='green', label=str('Intersect Error Mean: ' + str(np.round(np.mean(final_intersect_error), 3)) + '%'))
+# plt.axvline(np.median(final_integral_error), color='blue', label=str('Integral Error Median: ' + str(np.round(np.median(final_integral_error), 3)) + '%'))
+# plt.axhline(np.median(final_intersect_error), color='blue', label=str('Intersect Error Median: ' + str(np.round(np.median(final_intersect_error), 3)) + '%'))
+# plt.axvline(np.mean(final_integral_error), color='green', label=str('Integral Error Mean: ' + str(np.round(np.mean(final_integral_error), 3)) + '%'))
+# plt.axhline(np.mean(final_intersect_error), color='green', label=str('Intersect Error Mean: ' + str(np.round(np.mean(final_intersect_error), 3)) + '%'))
 # plt.xlabel('Integral Error (%)')
 # plt.ylabel('Interesct Error (%)')
 # plt.xticks(np.arange(0, 110, 10))
@@ -155,10 +152,10 @@ plt.show()
 
 print(np.corrcoef(final_integral_error, final_modulus_error)[0,1])
 # plt.scatter(final_integral_error, final_modulus_error, color='black', marker='x', s=2)
-# # plt.axvline(np.median(final_integral_error), color='blue', label=str('Integral Error Median: ' + str(np.round(np.median(final_integral_error), 3)) + '%'))
-# # plt.axhline(np.median(final_modulus_error), color='blue', label=str('Modulus Error Median: ' + str(np.round(np.median(final_modulus_error), 3)) + '%'))
-# # plt.axvline(np.mean(final_integral_error), color='green', label=str('Integral Error Mean: ' + str(np.round(np.mean(final_integral_error), 3)) + '%'))
-# # plt.axhline(np.mean(final_modulus_error), color='green', label=str('Modulus Error Mean: ' + str(np.round(np.mean(final_modulus_error), 3)) + '%'))
+# plt.axvline(np.median(final_integral_error), color='blue', label=str('Integral Error Median: ' + str(np.round(np.median(final_integral_error), 3)) + '%'))
+# plt.axhline(np.median(final_modulus_error), color='blue', label=str('Modulus Error Median: ' + str(np.round(np.median(final_modulus_error), 3)) + '%'))
+# plt.axvline(np.mean(final_integral_error), color='green', label=str('Integral Error Mean: ' + str(np.round(np.mean(final_integral_error), 3)) + '%'))
+# plt.axhline(np.mean(final_modulus_error), color='green', label=str('Modulus Error Mean: ' + str(np.round(np.mean(final_modulus_error), 3)) + '%'))
 # plt.xlabel('Integral Error (%)')
 # plt.ylabel('Modulus Error (%)')
 # plt.xticks(np.arange(0, 110, 10))
@@ -194,4 +191,3 @@ print(np.corrcoef(final_integral_error, final_modulus_error)[0,1])
 
 
 # print(integral_error_total)
-

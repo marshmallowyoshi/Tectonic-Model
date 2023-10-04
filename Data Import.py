@@ -40,11 +40,11 @@ def batchAnalysis(rawData):
     for key, value in rawData.items():
         if isinstance(value, dict):
             for key2, value2 in value.items():
-                alg.fullSegmentAnalysis(value2[0], value2[1], name=key + ' ' + key2, peakRateThreshold=0.03, join=True, segmentMode='poly', plot=True, title='short', samples_per_period=1000, bands=(1,31), sampling_period=1)
+                alg.full_segment_analysis(value2[0], value2[1], name=key + ' ' + key2, peak_rate_threshold=0.03, join=True, segment_mode='poly', plot=True, title='short', samples_per_period=1000, bands=(1,31), sampling_period=1)
                 plt.savefig('figures\\analysis\\' + key + ' ' + key2 + '.png', dpi='figure', bbox_inches='tight', format=None)
                 plt.clf()
         else:
-            alg.fullSegmentAnalysis(value[0], value[1], name=key, peakRateThreshold=0.03, join=True, segmentMode='poly', plot=True, title='short', samples_per_period=1000, bands=(1,31), sampling_period=1)
+            alg.full_segment_analysis(value[0], value[1], name=key, peak_rate_threshold=0.03, join=True, segment_mode='poly', plot=True, title='short', samples_per_period=1000, bands=(1,31), sampling_period=1)
             plt.savefig('figures\\analysis\\' + key + '.png', dpi='figure', bbox_inches='tight', format=None)
             plt.clf()
 
@@ -58,24 +58,24 @@ def batchMinimum(rawData,
     for key, value in rawData.items():
         if isinstance(value, dict):
             for key2, value2 in value.items():
-                error = alg.findMinimumSampleRate(value2[0], value2[1], 
-                                                  name=key + ' ' + key2, 
-                                                  plot=False, 
-                                                  verbose=False, 
-                                                  resampling_kind=resampling_kind, 
-                                                  peakRateThreshold=peak_rate_threshold,
+                error = alg.find_minimum_sample_rate(value2[0], value2[1],
+                                                  name=key + ' ' + key2,
+                                                  plot=False,
+                                                  verbose=False,
+                                                  resampling_kind=resampling_kind,
+                                                  peak_rate_threshold=peak_rate_threshold,
                                                   samples_per_period=samples_per_period,
                                                   sampling_period=sampling_period,
                                                   get_error=True)
                 errorData.append((key + ' ' + key2, error))
 
         else:
-            error = alg.findMinimumSampleRate(value[0], value[1], 
-                                              name=key, 
-                                              plot=False, 
-                                              verbose=False, 
-                                              resampling_kind=resampling_kind, 
-                                              peakRateThreshold=peak_rate_threshold,
+            error = alg.find_minimum_sample_rate(value[0], value[1],
+                                              name=key,
+                                              plot=False,
+                                              verbose=False,
+                                              resampling_kind=resampling_kind,
+                                              peak_rate_threshold=peak_rate_threshold,
                                               samples_per_period=samples_per_period,
                                               sampling_period=sampling_period,
                                               get_error=True)
@@ -106,7 +106,7 @@ def exportBatchMinimum(peak_rate_threshold=0.04,
     # df['Integral Error'] = df['Integral Error'].apply(lambda x: [i[1] for i in x])
     # df['Modulus Error'] = df['Modulus Error'].apply(lambda x: [i[1] for i in x])
 
-    df.to_csv(str('results with error progression ' + 
+    df.to_csv(str('results with error progression ' +
                 'kind=' + resampling_kind + 
                 ' peakratethreshold=' + str(peak_rate_threshold) + 
                 ' samplesperperiod=' + str(samples_per_period) + 

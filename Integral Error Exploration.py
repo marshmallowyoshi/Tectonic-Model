@@ -14,11 +14,11 @@ y = np.asarray(df.iloc[:,3])
 # MODULUS ERROR
 
 
-allSegments, polynomialRegression = alg.fullSegmentAnalysis(x,y, name=name, peakRateThreshold=0.03, join=True, segmentMode='poly', plot=False)
-x_2, y_2 = alg.resampleToPeak(x, y, sample_rate_override=len(x)/4)
-allSegments2, polynomialRegression2 = alg.fullSegmentAnalysis(x_2,y_2, name=name, peakRateThreshold=0.03, join=True, segmentMode='poly', plot=False)
-area = alg.integralDifference(polynomialRegression[0][0], polynomialRegression2[0][0], (allSegments[0][0],allSegments[0][2]), (allSegments2[0][0],allSegments2[0][2]))
-allAreas = alg.allSegmentsIntegral(allSegments, allSegments2, polynomialRegression, polynomialRegression2)
+allSegments, polynomialRegression = alg.full_segment_analysis(x,y, name=name, peak_rate_threshold=0.03, join=True, segment_mode='poly', plot=False)
+x_2, y_2 = alg.resample_to_peak(x, y, sample_rate_override=len(x)/4)
+allSegments2, polynomialRegression2 = alg.full_segment_analysis(x_2,y_2, name=name, peak_rate_threshold=0.03, join=True, segment_mode='poly', plot=False)
+area = alg.integral_difference(polynomialRegression[0][0], polynomialRegression2[0][0], (allSegments[0][0],allSegments[0][2]), (allSegments2[0][0],allSegments2[0][2]))
+allAreas = alg.all_segments_integral(allSegments, allSegments2, polynomialRegression, polynomialRegression2)
 
 totalDiff = allAreas[1]*100
 print(np.round(totalDiff,2), "%", sep="")
@@ -37,12 +37,12 @@ print(np.round(totalDiff,2), "%", sep="")
 #     xPlot = xPlot + allSegments2[i][0]
 #     plt.plot(xPlot, yPlot, color='blue')
 # plt.show()
-xResampled, yResampled = alg.resampleToPeak(x,y)
-x_2Resampled, y_2Resampled = alg.resampleToPeak(x_2,y_2)
-alg.cubicPlot(allSegments, polynomialRegression, label='Original', color='red')
-alg.cubicPlot(allSegments2, polynomialRegression2, label='Reduced', color='blue')
+xResampled, yResampled = alg.resample_to_peak(x,y)
+x_2Resampled, y_2Resampled = alg.resample_to_peak(x_2,y_2)
+alg.cubic_plot(allSegments, polynomialRegression, label='Original', color='red')
+alg.cubic_plot(allSegments2, polynomialRegression2, label='Reduced', color='blue')
 
-modulus_error = alg.modulusError(x, y, x_2, y_2)[1]*100
+modulus_error = alg.modulus_error(x, y, x_2, y_2)[1]*100
 print(modulus_error)
 # plt.plot(np.arange(250), y_2Resampled, color='black', label='Raw Data')
 # plt.plot(np.arange(2500),y_2Resampled, color='green', label='Reduced Data')
