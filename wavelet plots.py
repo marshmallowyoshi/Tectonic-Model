@@ -10,7 +10,7 @@ x = np.asarray(df.iloc[:,0])
 y = np.asarray(df.iloc[:,3])
 y = signal.savgol_filter(y, 11, 3)
 
-contWav = alg.waveletGen(x,y)
+contWav = alg.wavelet_generator(x,y)
 
 
 fig = go.Figure()

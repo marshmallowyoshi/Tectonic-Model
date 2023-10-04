@@ -11,33 +11,33 @@ df = pd.read_csv(name)
 
 x = np.asarray(df.iloc[:,0])
 y = np.asarray(df.iloc[:,3])
-x2, y2 = alg.resampleToPeak(x,y, sample_rate_override=31)
-allSegments, segmentRegression = alg.fullSegmentAnalysis(x2,y2,
+x2, y2 = alg.resample_to_peak(x,y, sample_rate_override=31)
+allSegments, segmentRegression = alg.full_segment_analysis(x2,y2,
                                                             plot=False,
                                                             skip_wavelets=True,
-                                                            peakRateThreshold=0.04,
+                                                            peak_rate_threshold=0.04,
                                                             samples_per_period=1300,
                                                             sampling_period=1,
                                                             bands=(1,31),
                                                             resampling_kind='quadratic',
                                                             join=True,
-                                                            segmentMode='poly',
+                                                            segment_mode='poly',
                                                             title='short',
                                                             name=name)
-x3, y3 = alg.resampleToPeak(x,y, sample_rate_override=28)
-allSegments2, segmentRegression2 = alg.fullSegmentAnalysis(x3,y3,
+x3, y3 = alg.resample_to_peak(x,y, sample_rate_override=28)
+allSegments2, segmentRegression2 = alg.full_segment_analysis(x3,y3,
                                                             plot=False,
                                                             skip_wavelets=True,
-                                                            peakRateThreshold=0.04,
+                                                            peak_rate_threshold=0.04,
                                                             samples_per_period=1300,
                                                             sampling_period=1,
                                                             bands=(1,31),
                                                             resampling_kind='quadratic',
                                                             join=True,
-                                                            segmentMode='poly',
+                                                            segment_mode='poly',
                                                             title='short',
                                                             name=name)
-contWav = alg.waveletGen(x,y)
+contWav = alg.wavelet_generator(x,y)
     
 fig, ax = plt.subplots(1, 1)
 
