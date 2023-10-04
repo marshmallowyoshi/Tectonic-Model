@@ -1,11 +1,6 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
 import ast
-import scipy.stats as stats
-
-
-import algorithm as alg
+import pandas as pd
+import matplotlib.pyplot as plt
 
 df = pd.read_csv('results with error progression kind=quadratic peakratethreshold=0.04 samplesperperiod=1300 samplingperiod=1.csv', 
                  converters={'Integral Error':ast.literal_eval,'Modulus Error':ast.literal_eval, 'Intersect Error':ast.literal_eval, 'Sample Counts':ast.literal_eval})

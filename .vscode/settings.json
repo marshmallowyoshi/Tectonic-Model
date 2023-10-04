@@ -1,6 +1,3 @@
 {
-    "pylint.args": [
-        "--variable-naming-style=camelCase",
-        "--function-naming-style=camelCase"
-    ]
+    "pylint.importStrategy": "fromEnvironment"
 }

@@ -9,7 +9,7 @@ df = pd.read_csv('data/R2 H3.csv')
 x = np.asarray(df.iloc[:,0])
 y = np.asarray(df.iloc[:,3])
 
-contWav = alg.waveletGen(x,y)
+contWav = alg.wavelet_generator(x,y)
 dips = [list(find_peaks(wavelength*-1)[0]) for wavelength in contWav[0]]
 peaks = [list(find_peaks(wavelength)[0]) for wavelength in contWav[0]]
 # Plot
